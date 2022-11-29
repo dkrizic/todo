@@ -58,9 +58,3 @@ func (s *server) Delete(ctx context.Context, req *todo.DeleteRequest) (resp *tod
 	log.WithField("id", req.Id).Info("Deleting todo")
 	return &todo.DeleteResponse{}, nil
 }
-
-/*
-func (s *server) mustEmbedUnimplementedToDoServiceServer() {
-	panic("implement me")
-}
-*/

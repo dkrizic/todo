@@ -20,8 +20,9 @@ func main() {
 	_, err = tc.Create(ctx, &todo.CreateOrUpdateRequest{
 		Api: "v1",
 		Todo: &todo.ToDo{
-			Id:    uuid.New().String(),
-			Title: "Another todo",
+			Id:          uuid.New().String(),
+			Title:       "Another todo",
+			Description: "This is the description of the todo",
 		},
 	})
 	if err != nil {
