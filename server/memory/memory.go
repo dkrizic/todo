@@ -41,7 +41,7 @@ func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 }
 
 func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *todo.GetAllResponse, err error) {
-	log.Info("Getting all todos")
+	log.WithField("count", len(todoMap)).Info("Getting all todos")
 	// convert map of todoMap to slice
 	return &todo.GetAllResponse{
 		Api:   "v1",

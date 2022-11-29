@@ -574,6 +574,69 @@ func (x *DeleteResponse) GetId() string {
 	return ""
 }
 
+type Change struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Api    string `protobuf:"bytes,1,opt,name=api,proto3" json:"api,omitempty"`
+	Before *ToDo  `protobuf:"bytes,2,opt,name=before,proto3" json:"before,omitempty"`
+	After  *ToDo  `protobuf:"bytes,3,opt,name=after,proto3" json:"after,omitempty"`
+}
+
+func (x *Change) Reset() {
+	*x = Change{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_todo_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Change) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Change) ProtoMessage() {}
+
+func (x *Change) ProtoReflect() protoreflect.Message {
+	mi := &file_todo_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Change.ProtoReflect.Descriptor instead.
+func (*Change) Descriptor() ([]byte, []int) {
+	return file_todo_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *Change) GetApi() string {
+	if x != nil {
+		return x.Api
+	}
+	return ""
+}
+
+func (x *Change) GetBefore() *ToDo {
+	if x != nil {
+		return x.Before
+	}
+	return nil
+}
+
+func (x *Change) GetAfter() *ToDo {
+	if x != nil {
+		return x.After
+	}
+	return nil
+}
+
 var File_todo_proto protoreflect.FileDescriptor
 
 var file_todo_proto_rawDesc = []byte{
@@ -623,7 +686,13 @@ var file_todo_proto_rawDesc = []byte{
 	0x0e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
 	0x10, 0x0a, 0x03, 0x61, 0x70, 0x69, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x61, 0x70,
 	0x69, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
-	0x64, 0x32, 0x9c, 0x03, 0x0a, 0x0b, 0x54, 0x6f, 0x44, 0x6f, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63,
+	0x64, 0x22, 0x5e, 0x0a, 0x06, 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x61,
+	0x70, 0x69, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x61, 0x70, 0x69, 0x12, 0x21, 0x0a,
+	0x06, 0x62, 0x65, 0x66, 0x6f, 0x72, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x09, 0x2e,
+	0x61, 0x70, 0x69, 0x2e, 0x54, 0x6f, 0x44, 0x6f, 0x52, 0x06, 0x62, 0x65, 0x66, 0x6f, 0x72, 0x65,
+	0x12, 0x1f, 0x0a, 0x05, 0x61, 0x66, 0x74, 0x65, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x09, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x6f, 0x44, 0x6f, 0x52, 0x05, 0x61, 0x66, 0x74, 0x65,
+	0x72, 0x32, 0x9c, 0x03, 0x0a, 0x0b, 0x54, 0x6f, 0x44, 0x6f, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63,
 	0x65, 0x12, 0x57, 0x0a, 0x06, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x12, 0x1a, 0x2e, 0x61, 0x70,
 	0x69, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x4f, 0x72, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
 	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x43, 0x72,
@@ -667,7 +736,7 @@ func file_todo_proto_rawDescGZIP() []byte {
 }
 
 var file_todo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_todo_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_todo_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_todo_proto_goTypes = []interface{}{
 	(ToDoStatus)(0),                // 0: api.ToDo.status
 	(*ToDo)(nil),                   // 1: api.ToDo
@@ -679,29 +748,32 @@ var file_todo_proto_goTypes = []interface{}{
 	(*GetResponse)(nil),            // 7: api.GetResponse
 	(*DeleteRequest)(nil),          // 8: api.DeleteRequest
 	(*DeleteResponse)(nil),         // 9: api.DeleteResponse
-	(*timestamppb.Timestamp)(nil),  // 10: google.protobuf.Timestamp
+	(*Change)(nil),                 // 10: api.Change
+	(*timestamppb.Timestamp)(nil),  // 11: google.protobuf.Timestamp
 }
 var file_todo_proto_depIdxs = []int32{
-	10, // 0: api.ToDo.reminder:type_name -> google.protobuf.Timestamp
+	11, // 0: api.ToDo.reminder:type_name -> google.protobuf.Timestamp
 	1,  // 1: api.CreateOrUpdateRequest.todo:type_name -> api.ToDo
 	1,  // 2: api.CreateOrUpdateResponse.todo:type_name -> api.ToDo
 	1,  // 3: api.GetAllResponse.todos:type_name -> api.ToDo
 	1,  // 4: api.GetResponse.todo:type_name -> api.ToDo
-	2,  // 5: api.ToDoService.Create:input_type -> api.CreateOrUpdateRequest
-	2,  // 6: api.ToDoService.Update:input_type -> api.CreateOrUpdateRequest
-	4,  // 7: api.ToDoService.GetAll:input_type -> api.GetAllRequest
-	6,  // 8: api.ToDoService.Get:input_type -> api.GetRequest
-	8,  // 9: api.ToDoService.Delete:input_type -> api.DeleteRequest
-	3,  // 10: api.ToDoService.Create:output_type -> api.CreateOrUpdateResponse
-	3,  // 11: api.ToDoService.Update:output_type -> api.CreateOrUpdateResponse
-	5,  // 12: api.ToDoService.GetAll:output_type -> api.GetAllResponse
-	7,  // 13: api.ToDoService.Get:output_type -> api.GetResponse
-	9,  // 14: api.ToDoService.Delete:output_type -> api.DeleteResponse
-	10, // [10:15] is the sub-list for method output_type
-	5,  // [5:10] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	1,  // 5: api.Change.before:type_name -> api.ToDo
+	1,  // 6: api.Change.after:type_name -> api.ToDo
+	2,  // 7: api.ToDoService.Create:input_type -> api.CreateOrUpdateRequest
+	2,  // 8: api.ToDoService.Update:input_type -> api.CreateOrUpdateRequest
+	4,  // 9: api.ToDoService.GetAll:input_type -> api.GetAllRequest
+	6,  // 10: api.ToDoService.Get:input_type -> api.GetRequest
+	8,  // 11: api.ToDoService.Delete:input_type -> api.DeleteRequest
+	3,  // 12: api.ToDoService.Create:output_type -> api.CreateOrUpdateResponse
+	3,  // 13: api.ToDoService.Update:output_type -> api.CreateOrUpdateResponse
+	5,  // 14: api.ToDoService.GetAll:output_type -> api.GetAllResponse
+	7,  // 15: api.ToDoService.Get:output_type -> api.GetResponse
+	9,  // 16: api.ToDoService.Delete:output_type -> api.DeleteResponse
+	12, // [12:17] is the sub-list for method output_type
+	7,  // [7:12] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_todo_proto_init() }
@@ -818,6 +890,18 @@ func file_todo_proto_init() {
 				return nil
 			}
 		}
+		file_todo_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Change); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -825,7 +909,7 @@ func file_todo_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_todo_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   9,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

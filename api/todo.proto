@@ -57,6 +57,12 @@ message DeleteResponse {
   string id = 2;
 }
 
+message Change {
+  string api = 1;
+  ToDo before = 2;
+  ToDo after = 3;
+}
+
 service ToDoService {
   rpc Create(CreateOrUpdateRequest) returns (CreateOrUpdateResponse) {
     option (google.api.http) = {
