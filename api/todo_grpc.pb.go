@@ -4,7 +4,7 @@
 // - protoc             v3.21.9
 // source: todo.proto
 
-package main
+package api
 
 import (
 	context "context"
@@ -39,7 +39,7 @@ func NewToDoServiceClient(cc grpc.ClientConnInterface) ToDoServiceClient {
 
 func (c *toDoServiceClient) Create(ctx context.Context, in *CreateOrUpdateRequest, opts ...grpc.CallOption) (*CreateOrUpdateResponse, error) {
 	out := new(CreateOrUpdateResponse)
-	err := c.cc.Invoke(ctx, "/todo.ToDoService/Create", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.ToDoService/Create", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (c *toDoServiceClient) Create(ctx context.Context, in *CreateOrUpdateReques
 
 func (c *toDoServiceClient) Update(ctx context.Context, in *CreateOrUpdateRequest, opts ...grpc.CallOption) (*CreateOrUpdateResponse, error) {
 	out := new(CreateOrUpdateResponse)
-	err := c.cc.Invoke(ctx, "/todo.ToDoService/Update", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.ToDoService/Update", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *toDoServiceClient) Update(ctx context.Context, in *CreateOrUpdateReques
 
 func (c *toDoServiceClient) GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error) {
 	out := new(GetAllResponse)
-	err := c.cc.Invoke(ctx, "/todo.ToDoService/GetAll", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.ToDoService/GetAll", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (c *toDoServiceClient) GetAll(ctx context.Context, in *GetAllRequest, opts 
 
 func (c *toDoServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
 	out := new(GetResponse)
-	err := c.cc.Invoke(ctx, "/todo.ToDoService/Get", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.ToDoService/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (c *toDoServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grp
 
 func (c *toDoServiceClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
 	out := new(DeleteResponse)
-	err := c.cc.Invoke(ctx, "/todo.ToDoService/Delete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.ToDoService/Delete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +136,7 @@ func _ToDoService_Create_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/todo.ToDoService/Create",
+		FullMethod: "/api.ToDoService/Create",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ToDoServiceServer).Create(ctx, req.(*CreateOrUpdateRequest))
@@ -154,7 +154,7 @@ func _ToDoService_Update_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/todo.ToDoService/Update",
+		FullMethod: "/api.ToDoService/Update",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ToDoServiceServer).Update(ctx, req.(*CreateOrUpdateRequest))
@@ -172,7 +172,7 @@ func _ToDoService_GetAll_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/todo.ToDoService/GetAll",
+		FullMethod: "/api.ToDoService/GetAll",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ToDoServiceServer).GetAll(ctx, req.(*GetAllRequest))
@@ -190,7 +190,7 @@ func _ToDoService_Get_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/todo.ToDoService/Get",
+		FullMethod: "/api.ToDoService/Get",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ToDoServiceServer).Get(ctx, req.(*GetRequest))
@@ -208,7 +208,7 @@ func _ToDoService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/todo.ToDoService/Delete",
+		FullMethod: "/api.ToDoService/Delete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ToDoServiceServer).Delete(ctx, req.(*DeleteRequest))
@@ -220,7 +220,7 @@ func _ToDoService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ToDoService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "todo.ToDoService",
+	ServiceName: "api.ToDoService",
 	HandlerType: (*ToDoServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

@@ -2,11 +2,11 @@
 // source: todo.proto
 
 /*
-Package main is a reverse proxy.
+Package api is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package main
+package api
 
 import (
 	"context"
@@ -323,7 +323,7 @@ func RegisterToDoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.ToDoService/Create", runtime.WithHTTPPathPattern("/v1/todos"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.ToDoService/Create", runtime.WithHTTPPathPattern("/v1/todos"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -348,7 +348,7 @@ func RegisterToDoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.ToDoService/Update", runtime.WithHTTPPathPattern("/v1/todos/{todo.id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.ToDoService/Update", runtime.WithHTTPPathPattern("/v1/todos/{todo.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -373,7 +373,7 @@ func RegisterToDoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.ToDoService/GetAll", runtime.WithHTTPPathPattern("/v1/todos"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.ToDoService/GetAll", runtime.WithHTTPPathPattern("/v1/todos"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -398,7 +398,7 @@ func RegisterToDoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.ToDoService/Get", runtime.WithHTTPPathPattern("/v1/todos/{id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.ToDoService/Get", runtime.WithHTTPPathPattern("/v1/todos/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -423,7 +423,7 @@ func RegisterToDoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.ToDoService/Delete", runtime.WithHTTPPathPattern("/v1/todos/{id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.ToDoService/Delete", runtime.WithHTTPPathPattern("/v1/todos/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -487,7 +487,7 @@ func RegisterToDoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/todo.ToDoService/Create", runtime.WithHTTPPathPattern("/v1/todos"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.ToDoService/Create", runtime.WithHTTPPathPattern("/v1/todos"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -509,7 +509,7 @@ func RegisterToDoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/todo.ToDoService/Update", runtime.WithHTTPPathPattern("/v1/todos/{todo.id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.ToDoService/Update", runtime.WithHTTPPathPattern("/v1/todos/{todo.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -531,7 +531,7 @@ func RegisterToDoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/todo.ToDoService/GetAll", runtime.WithHTTPPathPattern("/v1/todos"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.ToDoService/GetAll", runtime.WithHTTPPathPattern("/v1/todos"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -553,7 +553,7 @@ func RegisterToDoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/todo.ToDoService/Get", runtime.WithHTTPPathPattern("/v1/todos/{id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.ToDoService/Get", runtime.WithHTTPPathPattern("/v1/todos/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -575,7 +575,7 @@ func RegisterToDoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/todo.ToDoService/Delete", runtime.WithHTTPPathPattern("/v1/todos/{id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.ToDoService/Delete", runtime.WithHTTPPathPattern("/v1/todos/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return

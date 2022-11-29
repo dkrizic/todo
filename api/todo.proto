@@ -1,10 +1,10 @@
 syntax = "proto3";
-package todo;
+package api;
 
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 
-option go_package = "github.com/dkrizic/proto-demo/api/main";
+option go_package = "github.com/dkrizic/proto-demo/api";
 
 message ToDo {
   string id = 1;
