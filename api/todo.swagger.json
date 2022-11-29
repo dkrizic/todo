@@ -1,13 +1,26 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "todo.proto",
-    "version": "version not set"
+    "title": "Notes",
+    "version": "1.0",
+    "contact": {
+      "name": "todos",
+      "url": "https://github.com/dkrizic/proto-demo",
+      "email": "darko@krizic.net"
+    },
+    "license": {
+      "name": "BSD 3-Clause License",
+      "url": "https://github.com/dkrizic/proto-demo/LICENSE.md"
+    }
   },
   "tags": [
     {
       "name": "ToDoService"
     }
+  ],
+  "schemes": [
+    "http",
+    "https"
   ],
   "consumes": [
     "application/json"
