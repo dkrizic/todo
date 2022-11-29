@@ -4,15 +4,10 @@ import (
 	"context"
 	todo "github.com/dkrizic/proto-demo/api"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/exp/maps"
 )
 
-var todoList = []*todo.ToDo{
-	{
-		Id:          "1",
-		Title:       "First todo",
-		Description: "First todo description",
-	},
-}
+var todoMap = map[string]*todo.ToDo{}
 
 type server struct {
 	todo.UnimplementedToDoServiceServer
@@ -28,19 +23,29 @@ func NewServer() *server {
 
 func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
 	log.WithField("id", req.Todo.Id).WithField("title", req.Todo.Title).Info("Creating new todo")
-	return &todo.CreateOrUpdateResponse{}, nil
+	// add to map
+	todoMap[req.Todo.Id] = req.Todo
+	return &todo.CreateOrUpdateResponse{
+		Api:  "v1",
+		Todo: req.Todo,
+	}, nil
 }
 
 func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
 	log.WithField("id", req.Todo.Id).WithField("title", req.Todo.Title).Info("Updating todo")
-	return &todo.CreateOrUpdateResponse{}, nil
+	todoMap[req.Todo.Id] = req.Todo
+	return &todo.CreateOrUpdateResponse{
+		Api:  "v1",
+		Todo: req.Todo,
+	}, nil
 }
 
 func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *todo.GetAllResponse, err error) {
 	log.Info("Getting all todos")
+	// convert map of todoMap to slice
 	return &todo.GetAllResponse{
 		Api:   "v1",
-		Todos: todoList,
+		Todos: maps.Values(todoMap),
 	}, nil
 }
 
