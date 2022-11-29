@@ -4,7 +4,7 @@ package todo;
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 
-option go_package = "github.com/dkrizic/proto-demo/api";
+option go_package = "github.com/dkrizic/proto-demo/api/main";
 
 message ToDo {
   string id = 1;

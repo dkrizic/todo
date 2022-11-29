@@ -8,8 +8,7 @@ go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
 go install google.golang.org/protobuf/cmd/protoc-gen-go
 go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
 #go get -u
-mkdir -p proto/google/api
-mkdir -p google/api    
+mkdir -p google/api
 curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/annotations.proto >google/api/annotations.proto
 curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/http.proto >google/api/http.proto
 
