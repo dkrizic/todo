@@ -1,0 +1,103 @@
+syntax = "proto3";
+package todo;
+
+import "google/protobuf/timestamp.proto";
+// import "google/api/annotations.proto";
+
+option go_package = "proto/todo";
+
+message ToDo {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  google.protobuf.Timestamp reminder = 4;
+  enum status {
+    TODO = 0;
+    IN_PROGRESS = 1;
+    COMPLETED = 2;
+  }
+}
+
+message CreateOrUpdateRequest {
+  string api = 1;
+  ToDo todo = 2;
+}
+
+message CreateOrUpdateResponse {
+  string api = 1;
+  ToDo todo = 2;
+}
+
+message GetAllRequest {
+  string api = 1;
+}
+
+message GetAllResponse {
+  string api = 1;
+  repeated ToDo todos = 2;
+}
+
+message GetRequest {
+  string api = 1;
+  string id = 2;
+}
+
+message GetResponse {
+  string api = 1;
+  ToDo todo = 2;
+}
+
+message DeleteRequest {
+  string api = 1;
+  string id = 2;
+}
+
+message DeleteResponse {
+  string api = 1;
+  string id = 2;
+}
+
+service ToDoService {
+  rpc Create(CreateOrUpdateRequest) returns (CreateOrUpdateResponse) {
+    /*
+    option (google.api.http) = {
+      post: "/v1/todos"
+      body: "*"
+    }
+     */
+  }
+
+  rpc Update(CreateOrUpdateRequest) returns (CreateOrUpdateResponse) {
+    /*
+    option (google.api.http) = {
+      put: "/v1/todos/{id}"
+      body: "*"
+    };
+     */
+  }
+  rpc GetAll(GetAllRequest) returns (GetAllResponse) {
+    /*
+    option (google.api.http) = {
+      get: "/v1/todos"
+    };
+
+     */
+  }
+
+  rpc Get(GetRequest) returns (GetResponse) {
+    /*
+    option (google.api.http) = {
+      get: "/v1/todos/{id}"
+    };
+
+     */
+  }
+
+  rpc Delete(DeleteRequest) returns (DeleteResponse) {
+    /*
+    option (google.api.http) = {
+      delete: "/v1/todos/{id}"
+    };
+     */
+  };
+}
