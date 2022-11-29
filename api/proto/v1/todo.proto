@@ -1,0 +1,65 @@
+syntax = "proto3";
+package v1;
+
+option go_package = "pkg/api/v1;v1";
+
+import "google/protobuf/timestamp.proto";
+
+message ToDo {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  google.protobuf.Timestamp reminder = 4;
+  enum status {
+    TODO = 0;
+    IN_PROGRESS = 1;
+    COMPLETED = 2;
+  }
+}
+
+message CreateOrUpdateRequest {
+  string api = 1;
+  ToDo todo = 2;
+}
+
+message CreateOrUpdateResponse {
+  string api = 1;
+  ToDo todo = 2;
+}
+
+message GetAllRequest {
+  string api = 1;
+}
+
+message GetAllResponse {
+  string api = 1;
+  repeated ToDo todos = 2;
+}
+
+message GetRequest {
+  string api = 1;
+  string id = 2;
+}
+
+message GetResponse {
+  string api = 1;
+  ToDo todo = 2;
+}
+
+message DeleteRequest {
+  string api = 1;
+  string id = 2;
+}
+
+message DeleteResponse {
+  string api = 1;
+  string id = 2;
+}
+
+service ToDoService {
+  rpc Create(CreateOrUpdateRequest) returns (CreateOrUpdateResponse);
+  rpc Update(CreateOrUpdateRequest) returns (CreateOrUpdateResponse);
+  rpc GetAll(GetAllRequest) returns (GetAllResponse);
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Delete(DeleteRequest) returns (DeleteResponse);
+}

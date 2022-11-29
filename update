@@ -1,0 +1,2 @@
+#!/bin/bash
+protoc api/proto/v1/todo.proto --go_out=.
