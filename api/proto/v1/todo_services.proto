@@ -1,0 +1,14 @@
+syntax = "proto3";
+package v1;
+
+option go_package = "pkg/api/v1;v1";
+
+import "todo_messages.proto";
+
+service ToDoService {
+  rpc Create(CreateOrUpdateRequest) returns (CreateOrUpdateResponse);
+  rpc Update(CreateOrUpdateRequest) returns (CreateOrUpdateResponse);
+  rpc GetAll(GetAllRequest) returns (GetAllResponse);
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Delete(DeleteRequest) returns (DeleteResponse);
+}

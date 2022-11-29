@@ -1,2 +1,2 @@
 #!/bin/bash
-protoc api/proto/v1/todo.proto --go_out=.
+protoc api/proto/v1/todo_services.proto --go_out=. --proto_path=api/proto/v1
