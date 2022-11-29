@@ -1,27 +1,16 @@
 package main
 
 import (
-	"github.com/dkrizic/proto-demo/proto/todo"
+	todo "github.com/dkrizic/proto-demo/api"
+	"github.com/dkrizic/proto-demo/server/memory"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"log"
 	"net"
 	"net/http"
 )
-
-type server struct {
-	todo.UnimplementedToDoServiceServer
-}
-
-func NewServer() *server {
-	return &server{}
-}
-
-func (s *server) CreateTodo(ctx context.Context, req *todo.CreateOrUpdateRequest) (*todo.CreateOrUpdateResponse, error) {
-	return &todo.CreateOrUpdateResponse{}, nil
-}
 
 func main() {
 	lis, err := net.Listen("tcp", ":8080")
@@ -30,7 +19,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	todo.RegisterToDoServiceServer(s, NewServer())
+	todo.RegisterToDoServiceServer(s, memory.NewServer())
 	log.Println("Serving gRPC on :8080")
 	go func() {
 		log.Fatal(s.Serve(lis))
@@ -38,7 +27,7 @@ func main() {
 
 	conn, err := grpc.DialContext(
 		context.Background(),
-		"localhost:8080",
+		"127.0.0.1:8080",
 		grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
