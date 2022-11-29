@@ -40,9 +40,16 @@ func main() {
 		log.Fatal("Failed to register gateway", err)
 	}
 
+	mux := http.NewServeMux()
+	mux.Handle("/", gwmux)
+	mux.HandleFunc("/swagger-ui/swagger.json", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "swagger.json")
+	})
+	mux.Handle("/swagger-ui/", http.StripPrefix("/swagger-ui/", http.FileServer(http.Dir("swagger-ui"))))
+
 	gwServer := &http.Server{
 		Addr:    ":8090",
-		Handler: gwmux,
+		Handler: mux,
 	}
 
 	log.Println("Service HTTP on :8090")
