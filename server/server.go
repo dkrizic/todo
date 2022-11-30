@@ -2,7 +2,7 @@ package main
 
 import (
 	todo "github.com/dkrizic/proto-demo/api"
-	"github.com/dkrizic/proto-demo/server/memory"
+	"github.com/dkrizic/todo/server/memory"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
@@ -13,7 +13,7 @@ import (
 	"net/http"
 )
 
-func main() {
+func mainX() {
 	lis, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		log.Fatal("Failed to listen", err)
