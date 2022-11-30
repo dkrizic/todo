@@ -20,10 +20,12 @@ jobs:
         id: version
         run: |
           if [[ -n "${GITHUB_REF##*/}" ]]; then
-              echo "::set-output name=version::${GITHUB_REF##*/}"
+              echo "version=${GITHUB_REF##*/}" >>$GITHUB_OUTPUT
           else
-              echo "::set-output name=version::${GITHUB_SHA::7}"
+              echo "version=${GITHUB_SHA::7}" >>$GITHUB_OUTPUT
           fi
+      - name: Print version
+        run: echo ${{ steps.version.outputs.version }}
 
   ci-amd64:
     runs-on: ubuntu-latest
