@@ -1,0 +1,49 @@
+image:
+  pullPolicy: Always
+resources:
+  limits:
+      cpu: 100m
+      memory: 128Mi
+  requests:
+      cpu: 100m
+      memory: 128Mi
+nodeSelector:
+  kubernetes.io/arch: arm64
+ingress:
+  http:
+    enabled: true
+    className: "nginx"
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+      external-dns: "true"
+      external-dns.alpha.kubernetes.io/access: public
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+      external-dns.alpha.kubernetes.io/target: 130.180.93.142
+    hosts:
+      - host: todo.krizic.net
+        paths:
+          - path: /api
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: todo-tls
+        hosts:
+          - todo.krizic.net
+  grpc:
+    enabled: true
+    className: "nginx"
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+      external-dns: "true"
+      external-dns.alpha.kubernetes.io/access: public
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+      external-dns.alpha.kubernetes.io/target: 130.180.93.142
+      nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+    hosts:
+      - host: todo.krizic.net
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: todo-tls
+        hosts:
+          - todo.krizic.net
