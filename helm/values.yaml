@@ -22,7 +22,7 @@ ingress:
     hosts:
       - host: todo.krizic.net
         paths:
-          - path: /api
+          - path: /v1
             pathType: ImplementationSpecific
     tls:
       - secretName: todo-tls
