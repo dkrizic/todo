@@ -51,10 +51,17 @@ func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *tod
 
 func (s *server) Get(ctx context.Context, req *todo.GetRequest) (resp *todo.GetResponse, err error) {
 	log.WithField("id", req.Id).Info("Getting todo")
-	return &todo.GetResponse{}, nil
+	return &todo.GetResponse{
+		Api:  "v1",
+		Todo: todoMap[req.Id],
+	}, nil
 }
 
 func (s *server) Delete(ctx context.Context, req *todo.DeleteRequest) (resp *todo.DeleteResponse, err error) {
 	log.WithField("id", req.Id).Info("Deleting todo")
-	return &todo.DeleteResponse{}, nil
+	delete(todoMap, req.Id)
+	return &todo.DeleteResponse{
+		Api: "v1",
+		Id:  req.Id,
+	}, nil
 }
