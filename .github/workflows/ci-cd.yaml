@@ -47,7 +47,10 @@ jobs:
 
       # Build docker image
       - name: Build docker image
-        run:  docker build -t todo-server-amd64:latest -f server/docker/Dockerfile --build-arg ARCH=amd64 .
+        run:  docker build -t ${{ env.REGISTRY}}/${{ github.actor }}/todo-server-amd64:latest -f server/docker/Dockerfile --build-arg ARCH=amd64 .
+
+      - name: Push docker image
+        run: docker push ${{ env.REGISTRY}}/${{ github.actor }}/todo-server-amd64:latest
 
   ci-arm64:
     runs-on: ubuntu-latest
@@ -58,4 +61,7 @@ jobs:
 
       # Build docker image
       - name: Build docker image
-        run:  docker build -t todo-server-arm64:latest -f server/docker/Dockerfile --build-arg ARCH=arm64 .
+        run:  docker build -t ${{ env.REGISTRY}}/${{ github.actor }}/todo-server-arm64:latest -f server/docker/Dockerfile --build-arg ARCH=arm64 .
+
+      - name: Push docker image
+        run: docker push ${{ env.REGISTRY}}/${{ github.actor }}/todo-server-arm64:latest
