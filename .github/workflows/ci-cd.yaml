@@ -1,0 +1,25 @@
+on:
+  push:
+    branches:
+      - main
+    pull_request:
+      branches:
+        - main
+
+jobs:
+
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      # checkout code
+      - uses: actions/checkout@v2
+
+      # Install go
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.19
+
+      # Compile server
+      - name: Compile server
+        working-directory: ./server
+        run: go build -o server server.go
