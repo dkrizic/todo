@@ -1,4 +1,4 @@
-module github.com/dkrizic/proto-demo/api
+module github.com/dkrizic/todo/api
 
 go 1.19
 
