@@ -17,7 +17,7 @@ ingress:
       cert-manager.io/cluster-issuer: letsencrypt-cloudflare
       external-dns: "true"
       external-dns.alpha.kubernetes.io/access: public
-      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
       external-dns.alpha.kubernetes.io/target: 130.180.93.142
     hosts:
       - host: todo.krizic.net
@@ -35,7 +35,7 @@ ingress:
       cert-manager.io/cluster-issuer: letsencrypt-cloudflare
       external-dns: "true"
       external-dns.alpha.kubernetes.io/access: public
-      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
       external-dns.alpha.kubernetes.io/target: 130.180.93.142
       nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
     hosts:
