@@ -5,12 +5,12 @@
     "version": "1.0",
     "contact": {
       "name": "todos",
-      "url": "https://github.com/dkrizic/proto-demo",
+      "url": "https://github.com/dkrizic/todo",
       "email": "darko@krizic.net"
     },
     "license": {
       "name": "BSD 3-Clause License",
-      "url": "https://github.com/dkrizic/proto-demo/LICENSE.md"
+      "url": "https://github.com/dkrizic/todo/LICENSE.md"
     }
   },
   "tags": [

@@ -17,6 +17,6 @@ package main
 
 import "github.com/dkrizic/todo/server/cmd"
 
-func main() {
+func mainX() {
 	cmd.Execute()
 }
