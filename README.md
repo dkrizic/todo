@@ -52,6 +52,10 @@ INFO[0035] Creating new todo                             id=d93f5341-071b-462b-a
 INFO[0035] Getting all todos                             count=1
 ```
 
+### Backends
+
+The server can be configured to use different backends. The default is a simple in-memory backend. More backends to come.
+
 ### Ports
 
 The following ports are used
