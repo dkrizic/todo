@@ -91,4 +91,4 @@ jobs:
           docker manifest annotate ${{ env.REGISTRY}}/${{ github.actor }}/todo-server:latest ${{ env.REGISTRY}}/${{ github.actor }}/todo-server-amd64:latest --os linux --arch amd64
 
       - name: Push multiarch manifest
-        run: docker push ${{ env.REGISTRY}}/${{ github.actor }}/todo-server:latest
+        run: docker manifest push ${{ env.REGISTRY}}/${{ github.actor }}/todo-server:latest
