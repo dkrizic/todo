@@ -1,0 +1,10 @@
+FROM golang:1.19 as builder
+COPY /api /build/api
+COPY /server /build/server
+WORKDIR /build/server
+ENV GOOS=linux
+ENV GOARCH=arm64
+RUN go build -ldflags="-extldflags=-static" -o server server.go
+
+FROM distroless/base-debian11
+COPY --from=builder /build/server/server /server
