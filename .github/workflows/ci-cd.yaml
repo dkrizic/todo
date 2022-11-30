@@ -16,5 +16,5 @@ jobs:
 
       # Build docker image
       - name: Build docker image
-        working-directory: /build/server
+        working-directory: ./build/server
         run:  docker build -t todo-server:amd64 -f server/docker/Dockerfile.amd64 .
