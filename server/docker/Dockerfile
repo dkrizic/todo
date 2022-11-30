@@ -1,9 +1,10 @@
 FROM golang:1.19 as builder
+ARG ARCH
 COPY /api /build/api
 COPY /server /build/server
 WORKDIR /build/server
 ENV GOOS=linux
-ENV GOARCH=amd64
+ENV GOARCH=${ARCH}
 RUN go build -ldflags="-extldflags=-static" -o server server.go
 
 FROM scratch
