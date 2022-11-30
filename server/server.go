@@ -8,6 +8,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/reflection"
 	"net"
 	"net/http"
 )
@@ -20,6 +21,7 @@ func main() {
 
 	s := grpc.NewServer()
 	todo.RegisterToDoServiceServer(s, memory.NewServer())
+	reflection.Register(s)
 	log.Println("Serving gRPC on :8080")
 	go func() {
 		log.Fatal(s.Serve(lis))
