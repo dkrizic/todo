@@ -26,4 +26,4 @@ jobs:
 
       # Build docker image
       - name: Build docker image
-        run:  docker build -t todo-server-arm64:latest -f server/docker/Dockerfile.ard64 .
+        run:  docker build -t todo-server-arm64:latest -f server/docker/Dockerfile.arm64 .
