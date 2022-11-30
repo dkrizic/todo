@@ -88,32 +88,32 @@ message Change {
 service ToDoService {
   rpc Create(CreateOrUpdateRequest) returns (CreateOrUpdateResponse) {
     option (google.api.http) = {
-      post: "/v1/todos"
+      post: "/api/v1/todos"
       body: "*"
     };
   }
 
   rpc Update(CreateOrUpdateRequest) returns (CreateOrUpdateResponse) {
     option (google.api.http) = {
-      put: "/v1/todos/{todo.id}"
+      put: "/api/v1/todos/{todo.id}"
       body: "*"
     };
   }
   rpc GetAll(GetAllRequest) returns (GetAllResponse) {
     option (google.api.http) = {
-      get: "/v1/todos"
+      get: "/api/v1/todos"
     };
   }
 
   rpc Get(GetRequest) returns (GetResponse) {
     option (google.api.http) = {
-      get: "/v1/todos/{id}"
+      get: "/api/v1/todos/{id}"
     };
   }
 
   rpc Delete(DeleteRequest) returns (DeleteResponse) {
     option (google.api.http) = {
-      delete: "/v1/todos/{id}"
+      delete: "/api/v1/todos/{id}"
     };
   };
 }

@@ -29,7 +29,7 @@
     "application/json"
   ],
   "paths": {
-    "/v1/todos": {
+    "/api/v1/todos": {
       "get": {
         "operationId": "ToDoService_GetAll",
         "responses": {
@@ -89,7 +89,7 @@
         ]
       }
     },
-    "/v1/todos/{id}": {
+    "/api/v1/todos/{id}": {
       "get": {
         "operationId": "ToDoService_Get",
         "responses": {
@@ -159,7 +159,7 @@
         ]
       }
     },
-    "/v1/todos/{todo.id}": {
+    "/api/v1/todos/{todo.id}": {
       "put": {
         "operationId": "ToDoService_Update",
         "responses": {
