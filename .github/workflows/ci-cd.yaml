@@ -16,5 +16,14 @@ jobs:
 
       # Build docker image
       - name: Build docker image
-        working-directory: ./build/server
-        run:  docker build -t todo-server:amd64 -f server/docker/Dockerfile.amd64 .
+        run:  docker build -t todo-server-amd64:latest -f server/docker/Dockerfile.amd64 .
+
+  ci-arm64:
+    runs-on: ubuntu-latest
+    steps:
+      # checkout code
+      - uses: actions/checkout@v2
+
+      # Build docker image
+      - name: Build docker image
+        run:  docker build -t todo-server-arm64:latest -f server/docker/Dockerfile.ard64 .

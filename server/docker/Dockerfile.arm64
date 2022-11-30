@@ -6,5 +6,6 @@ ENV GOOS=linux
 ENV GOARCH=arm64
 RUN go build -ldflags="-extldflags=-static" -o server server.go
 
-FROM distroless/base-debian11
+FROM scratch
 COPY --from=builder /build/server/server /server
+ENTRYPOINT ["/server"]
