@@ -1,0 +1,8 @@
+#!/bin/bash
+for arch in amd64 arm64
+do
+  docker build -t dkrizic/todo-server-$arch:latest --build-arg ARCH=$arch -f server/docker/Dockerfile .
+  docker push dkrizic/todo-server-$arch:latest
+done
+docker manifest create dkrizic/todo-server:latest --amend dkrizic/todo-server-amd64:latest --amend dkrizic/todo-server-arm64:latest
+docker manifest push dkrizic/todo-server:latest
