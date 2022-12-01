@@ -10,3 +10,4 @@ RUN go build -ldflags="-extldflags=-static" -o server server.go
 FROM scratch
 COPY --from=builder /build/server/server /server
 ENTRYPOINT ["/server"]
+CMD ["serve memory -p 8080 -g 9090"]
