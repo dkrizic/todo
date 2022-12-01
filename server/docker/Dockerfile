@@ -5,7 +5,7 @@ COPY /server /build/server
 WORKDIR /build/server
 ENV GOOS=linux
 ENV GOARCH=${ARCH}
-RUN go build -ldflags="-extldflags=-static" -o server server.go
+RUN go build -ldflags="-extldflags=-static" -o server main.go
 
 FROM scratch
 COPY --from=builder /build/server/server /server
