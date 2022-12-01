@@ -10,7 +10,7 @@ import (
 
 func main() {
 	log.Info("Starting app")
-	cc, err := grpc.Dial("localhost:8080", grpc.WithInsecure())
+	cc, err := grpc.Dial("localhost:9090", grpc.WithInsecure())
 	if err != nil {
 		log.WithError(err).Fatal("Error connecting to server")
 	}
