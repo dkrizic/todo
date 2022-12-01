@@ -1,2 +1,3 @@
 #!/bin/bash
-helm -n todo upgrade --install -f values.yaml todo ./charts/todo
+helm -n todo upgrade --install -f redis.yaml redis bitnami/redis
+helm -n todo upgrade --install -f todo.yaml todo ./charts/todo

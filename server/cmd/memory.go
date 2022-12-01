@@ -34,6 +34,8 @@ It will not work if there are multiple instances running concurrently.`,
 		return backend.Backend{
 			HttpPort:       httpPort,
 			GrpcPort:       grpcPort,
+			HealthPort:     healthPort,
+			MetricsPort:    metricsPort,
 			Implementation: memory.NewServer(),
 		}.Start()
 	},

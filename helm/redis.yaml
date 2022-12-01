@@ -1,0 +1,17 @@
+auth:
+  enabled: false
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+master:
+  persistence:
+    storageClass: longhorn
+  nodeSelector:
+    region: extranet
+replica:
+  persistence:
+    storageClass: longhorn
+  nodeSelector:
+    region: extranet
