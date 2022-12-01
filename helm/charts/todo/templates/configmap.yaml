@@ -5,6 +5,10 @@ metadata:
   labels:
     {{- include "todo.labels" . | nindent 4 }}
 data:
+  TODO_HTTP_PORT: "{{ .Values.service.http.port }}"
+  TODO_GRPC_PORT: "{{ .Values.service.grpc.port }}"
+  TOOO_HEALTH_PORT: "{{ .Values.service.health.port }}"
+  TODO_METRICS_PORT: "{{ .Values.service.metrics.port }}"
   TODO_REDIS_HOST: "{{ .Values.backend.redis.host }}"
   TODO_REDIS_PORT: "{{ .Values.backend.redis.port | toString }}"
   TODO_REDIS_USER: "{{ .Values.backend.redis.user }}"

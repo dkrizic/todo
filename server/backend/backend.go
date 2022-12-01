@@ -16,6 +16,8 @@ import (
 type Backend struct {
 	HttpPort       int
 	GrpcPort       int
+	HealthPort     int
+	MetricsPort    int
 	Implementation todo.ToDoServiceServer
 }
 
@@ -65,7 +67,21 @@ func (backend Backend) Start() (err error) {
 	}
 
 	log.WithField("httpPort", backend.HttpPort).Info("Serving HTTP and gRPC gateway")
-	log.Fatal(gwServer.ListenAndServe())
+	go func() {
+		log.Fatal(gwServer.ListenAndServe())
+	}()
+
+	healthmux := http.NewServeMux()
+	healthmux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+	healthServer := &http.Server{
+		Addr:    fmt.Sprintf(":%d", backend.HealthPort),
+		Handler: healthmux,
+	}
+	log.WithField("healthPort", backend.HealthPort).Info("Serving health")
+	log.Fatal(healthServer.ListenAndServe())
 
 	return nil
 }

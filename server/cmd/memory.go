@@ -21,11 +21,15 @@ It will not work if there are multiple instances running concurrently.`,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
 		httpPort, _ := serveCmd.PersistentFlags().GetInt(httpPortFlag)
 		grpcPort, _ := serveCmd.PersistentFlags().GetInt(grpcPortFlag)
+		healthPort, _ := serveCmd.PersistentFlags().GetInt(healthPortFlag)
+		metricsPort, _ := serveCmd.PersistentFlags().GetInt(metricsPortFlag)
 		maxEntries, _ := cmd.Flags().GetInt(maxEntriesFlag)
 		log.WithFields(log.Fields{
-			"httpPort":   httpPort,
-			"grpcPort":   grpcPort,
-			"maxEntries": maxEntries,
+			"httpPort":    httpPort,
+			"grpcPort":    grpcPort,
+			"healthPort":  healthPort,
+			"metricsPort": metricsPort,
+			"maxEntries":  maxEntries,
 		}).Info("Starting memory backend")
 		return backend.Backend{
 			HttpPort:       httpPort,

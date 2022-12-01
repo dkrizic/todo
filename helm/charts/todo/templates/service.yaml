@@ -15,5 +15,13 @@ spec:
       targetPort: grpc
       protocol: TCP
       name: grpc
+    - port: {{ .Values.service.health.port }}
+      targetPort: health
+      protocol: TCP
+      name: health
+    - port: {{ .Values.service.metrics.port }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
   selector:
     {{- include "todo.selectorLabels" . | nindent 4 }}
