@@ -99,3 +99,15 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+backend:
+  # Backend can be memory or redis (for now)
+  type: memory
+  memory:
+    maxEntries: 100
+  redis:
+    host: localhost
+    port: 6379
+    user: ""
+    password: ""
+    db: 0
