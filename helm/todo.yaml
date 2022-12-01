@@ -47,3 +47,7 @@ ingress:
       - secretName: todo-tls
         hosts:
           - todo.krizic.net
+backend:
+  type: redis
+  redis:
+    host: redis-master
