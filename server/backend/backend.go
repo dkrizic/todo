@@ -4,6 +4,7 @@ import (
 	"fmt"
 	todo "github.com/dkrizic/todo/api"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -77,6 +78,17 @@ func (backend Backend) Start() (err error) {
 	go func() {
 		log.Fatal(gwServer.ListenAndServe())
 	}()
+
+	metricsmux := http.NewServeMux()
+	metricsmux.Handle("/metrics", promhttp.Handler())
+	metricsServer := &http.Server{
+		Addr:    fmt.Sprintf(":%d", backend.MetricsPort),
+		Handler: metricsmux,
+	}
+	go func() {
+		log.Fatal(metricsServer.ListenAndServe())
+	}()
+	log.WithField("metricsPort", backend.MetricsPort).Info("Serving metrics")
 
 	healthmux := http.NewServeMux()
 	healthmux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
