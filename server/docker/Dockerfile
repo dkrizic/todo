@@ -10,4 +10,4 @@ RUN go build -ldflags="-extldflags=-static" -o server main.go
 FROM scratch
 COPY --from=builder /build/server/server /server
 ENTRYPOINT ["/server"]
-CMD ["serve","memory"]
+CMD ["-v=2","serve","memory"]
