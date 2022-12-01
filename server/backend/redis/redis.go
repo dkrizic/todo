@@ -3,14 +3,14 @@ package redis
 import (
 	"context"
 	todo "github.com/dkrizic/todo/api"
+	"github.com/go-redis/redis/v9"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/exp/maps"
+	"strconv"
 )
-
-var todoMap = map[string]*todo.ToDo{}
 
 type server struct {
 	todo.UnimplementedToDoServiceServer
+	redis *redis.Client
 }
 
 type Config struct {
@@ -21,15 +21,30 @@ type Config struct {
 }
 
 func NewServer(config *Config) *server {
-	log.WithFields(
+	llog := log.WithFields(
 		log.Fields{
 			"host": config.Host,
 			"port": config.Port,
 			"user": config.User,
 		},
-	).Info("Creating new redis server")
-	myServer := &server{}
-	// ensure server implements the inteface
+	)
+	llog.Info("Creating new redis server")
+
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     config.Host + ":" + strconv.Itoa(config.Port),
+		Password: config.Pass, // no password set
+		DB:       0,           // use default DB
+	})
+	status := rdb.Ping(context.Background())
+	if status.Err() != nil {
+		llog.WithError(status.Err()).Fatal("Failed to connect to redis")
+	}
+	llog.Info("Connected to redis")
+
+	myServer := &server{
+		redis: rdb,
+	}
+	// ensure server implements the interface
 	var _ todo.ToDoServiceServer = myServer
 	return &server{}
 }
@@ -37,7 +52,6 @@ func NewServer(config *Config) *server {
 func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
 	log.WithField("id", req.Todo.Id).WithField("title", req.Todo.Title).Info("Creating new todo")
 	// add to map
-	todoMap[req.Todo.Id] = req.Todo
 	return &todo.CreateOrUpdateResponse{
 		Api:  "v1",
 		Todo: req.Todo,
@@ -46,7 +60,6 @@ func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 
 func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
 	log.WithField("id", req.Todo.Id).WithField("title", req.Todo.Title).Info("Updating todo")
-	todoMap[req.Todo.Id] = req.Todo
 	return &todo.CreateOrUpdateResponse{
 		Api:  "v1",
 		Todo: req.Todo,
@@ -54,11 +67,11 @@ func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 }
 
 func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *todo.GetAllResponse, err error) {
-	log.WithField("count", len(todoMap)).Info("Getting all todos")
+	log.Info("Getting all todos")
 	// convert map of todoMap to slice
 	return &todo.GetAllResponse{
 		Api:   "v1",
-		Todos: maps.Values(todoMap),
+		Todos: []*todo.ToDo{},
 	}, nil
 }
 
@@ -66,13 +79,12 @@ func (s *server) Get(ctx context.Context, req *todo.GetRequest) (resp *todo.GetR
 	log.WithField("id", req.Id).Info("Getting todo")
 	return &todo.GetResponse{
 		Api:  "v1",
-		Todo: todoMap[req.Id],
+		Todo: &todo.ToDo{},
 	}, nil
 }
 
 func (s *server) Delete(ctx context.Context, req *todo.DeleteRequest) (resp *todo.DeleteResponse, err error) {
 	log.WithField("id", req.Id).Info("Deleting todo")
-	delete(todoMap, req.Id)
 	return &todo.DeleteResponse{
 		Api: "v1",
 		Id:  req.Id,
