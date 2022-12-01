@@ -5,8 +5,8 @@ metadata:
   labels:
     {{- include "todo.labels" . | nindent 4 }}
 data:
-  TODO_REDIS_HOST: {{ .Values.backend.redis.host | b64enc }}
-  TODO_REDIS_PORT: {{ .Values.backend.redis.port | b64enc }}
-  TODO_REDIS_USER: {{ .Values.backend.redis.user | b64enc }}
-  TODO_REDIS_DB: {{ .Values.backend.redis.db | b64enc }}
-  TODO_MEMORY_MAXENTRIES: {{ .Values.backend.memory.maxEntries | b64enc }}
+  TODO_REDIS_HOST: "{{ .Values.backend.redis.host }}"
+  TODO_REDIS_PORT: "{{ .Values.backend.redis.port | toString }}"
+  TODO_REDIS_USER: "{{ .Values.backend.redis.user }}"
+  TODO_REDIS_DB: "{{ .Values.backend.redis.db | toString}}"
+  TODO_MEMORY_MAXENTRIES: "{{ .Values.backend.memory.maxEntries | toString}}"
