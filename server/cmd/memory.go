@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/dkrizic/todo/server/backend"
-	"github.com/dkrizic/todo/server/memory"
+	"github.com/dkrizic/todo/server/backend/memory"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

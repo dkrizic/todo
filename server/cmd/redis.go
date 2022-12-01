@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/dkrizic/todo/server/backend"
-	"github.com/dkrizic/todo/server/memory"
+	"github.com/dkrizic/todo/server/backend/redis"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -15,24 +15,35 @@ const (
 	redisPassFlag = "redis-pass"
 )
 
-// memoryCmd represents the memory command
 var redisCmd = &cobra.Command{
 	Use:   "redis",
 	Short: "Use the in redis backend",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		httpPort, _ := serveCmd.PersistentFlags().GetInt(httpPortFlag)
-		grpcPort, _ := serveCmd.PersistentFlags().GetInt(grpcPortFlag)
-		maxEntries, _ := cmd.Flags().GetInt(maxEntriesFlag)
+		httpPort, _ := cmd.Flags().GetInt(httpPortFlag)
+		grpcPort, _ := cmd.Flags().GetInt(grpcPortFlag)
+		redisHost, _ := cmd.Flags().GetString(redisHostFlag)
+		redisPort, _ := cmd.Flags().GetInt(redisPortFlag)
+		redisUser, _ := cmd.Flags().GetString(redisUserFlag)
+		redisPass, _ := cmd.Flags().GetString(redisPassFlag)
+
 		log.WithFields(log.Fields{
-			"httpPort":   httpPort,
-			"grpcPort":   grpcPort,
-			"maxEntries": maxEntries,
+			"httpPort":  httpPort,
+			"grpcPort":  grpcPort,
+			"redisHost": redisHost,
+			"redisPort": redisPort,
+			"redisUser": redisUser,
 		}).Info("Starting redis backend")
+
 		return backend.Backend{
-			HttpPort:       httpPort,
-			GrpcPort:       grpcPort,
-			Implementation: memory.NewServer(),
+			HttpPort: httpPort,
+			GrpcPort: grpcPort,
+			Implementation: redis.NewServer(&redis.Config{
+				Host: redisHost,
+				Port: redisPort,
+				User: redisUser,
+				Pass: redisPass,
+			}),
 		}.Start()
 	},
 }
