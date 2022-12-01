@@ -59,8 +59,8 @@ func init() {
 	redisCmd.MarkFlagRequired(redisHostFlag)
 	redisCmd.MarkFlagRequired(redisPortFlag)
 
-	viper.BindEnv(redisHostFlag, "TODO_REDIS_HOST")
-	viper.BindEnv(redisPortFlag, "TODO_REDIS_PORT")
-	viper.BindEnv(redisUserFlag, "TODO_REDIS_USER")
-	viper.BindEnv(redisPassFlag, "TODO_REDIS_PASS")
+	viper.BindPFlag("TODO_REDIS_HOST", rootCmd.Flags().Lookup(redisHostFlag))
+	viper.BindPFlag("TODO_REDIS_PORT", rootCmd.Flags().Lookup(redisPortFlag))
+	viper.BindPFlag("TODO_REDIS_USER", rootCmd.Flags().Lookup(redisUserFlag))
+	viper.BindPFlag("TODO_REDIS_PASS", rootCmd.Flags().Lookup(redisPassFlag))
 }

@@ -25,6 +25,6 @@ func init() {
 
 	serveCmd.PersistentFlags().IntP(httpPortFlag, "p", 8080, "The port to listen on for HTTP requests")
 	serveCmd.PersistentFlags().IntP(grpcPortFlag, "g", 9090, "The port to listen on for gRPC requests")
-	viper.BindEnv(httpPortFlag, "TODO_HTTP_PORT")
-	viper.BindEnv(grpcPortFlag, "TODO_GRPC_PORT")
+	viper.BindPFlag("TODO_HTTP_PORT", rootCmd.PersistentFlags().Lookup(httpPortFlag))
+	viper.BindPFlag("TODO_GRPC_PORT", rootCmd.PersistentFlags().Lookup(grpcPortFlag))
 }
