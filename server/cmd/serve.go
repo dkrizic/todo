@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -24,4 +25,6 @@ func init() {
 
 	serveCmd.PersistentFlags().IntP(httpPortFlag, "p", 8080, "The port to listen on for HTTP requests")
 	serveCmd.PersistentFlags().IntP(grpcPortFlag, "g", 9090, "The port to listen on for gRPC requests")
+	viper.BindEnv(httpPortFlag, "TODO_HTTP_PORT")
+	viper.BindEnv(grpcPortFlag, "TODO_GRPC_PORT")
 }
