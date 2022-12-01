@@ -5,7 +5,7 @@ import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-option go_package = "github.com/dkrizic/proto-demo/api";
+option go_package = "github.com/dkrizic/todo/api";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
@@ -13,12 +13,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     version: "1.0";
     contact: {
       name: "todos";
-      url: "https://github.com/dkrizic/proto-demo";
+      url: "https://github.com/dkrizic/todo";
       email: "darko@krizic.net";
     };
     license: {
       name: "BSD 3-Clause License";
-      url: "https://github.com/dkrizic/proto-demo/LICENSE.md";
+      url: "https://github.com/dkrizic/todo/LICENSE.md";
     };
   };
 

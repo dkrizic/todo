@@ -1,8 +1,8 @@
-package main
+package backend
 
 import (
-	todo "github.com/dkrizic/proto-demo/api"
-	"github.com/dkrizic/proto-demo/server/memory"
+	"fmt"
+	todo "github.com/dkrizic/todo/api"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
@@ -13,33 +13,43 @@ import (
 	"net/http"
 )
 
-func main() {
-	lis, err := net.Listen("tcp", ":8080")
+type Backend struct {
+	HttpPort       int
+	GrpcPort       int
+	Implementation todo.ToDoServiceServer
+}
+
+func (backend Backend) Start() (err error) {
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", backend.GrpcPort))
 	if err != nil {
-		log.Fatal("Failed to listen", err)
+		log.WithField("grpcPort", backend.GrpcPort).WithError(err).Fatal("Failed to listen")
+		return err
 	}
 
 	s := grpc.NewServer()
-	todo.RegisterToDoServiceServer(s, memory.NewServer())
+	todo.RegisterToDoServiceServer(s, backend.Implementation)
 	reflection.Register(s)
-	log.Println("Serving gRPC on :8080")
+	log.WithField("grpcPort", backend.GrpcPort).Info("Serving gRPC")
 	go func() {
 		log.Fatal(s.Serve(lis))
 	}()
 
+	log.WithField("grpcPort", backend.GrpcPort).Info("Starting gRPC gateway")
 	conn, err := grpc.DialContext(
 		context.Background(),
-		"127.0.0.1:8080",
+		fmt.Sprintf("127.0.0.1:%d", backend.GrpcPort),
 		grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal("Failed to dial", err)
+		return err
 	}
 
 	gwmux := runtime.NewServeMux()
 	err = todo.RegisterToDoServiceHandler(context.Background(), gwmux, conn)
 	if err != nil {
 		log.Fatal("Failed to register gateway", err)
+		return err
 	}
 
 	mux := http.NewServeMux()
@@ -50,10 +60,12 @@ func main() {
 	mux.Handle("/swagger-ui/", http.StripPrefix("/swagger-ui/", http.FileServer(http.Dir("swagger-ui"))))
 
 	gwServer := &http.Server{
-		Addr:    ":8090",
+		Addr:    fmt.Sprintf(":%d", backend.HttpPort),
 		Handler: mux,
 	}
 
-	log.Println("Service HTTP on :8090")
+	log.WithField("httpPort", backend.HttpPort).Info("Serving HTTP and gRPC gateway")
 	log.Fatal(gwServer.ListenAndServe())
+
+	return nil
 }

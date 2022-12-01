@@ -1,9 +1,9 @@
-module github.com/dkrizic/proto-demo/client
+module github.com/dkrizic/todo/client
 
 go 1.19
 
 require (
-	github.com/dkrizic/proto-demo/api v0.0.0-00010101000000-000000000000
+	github.com/dkrizic/todo/api v0.0.0-20221130165503-515e25133c41
 	github.com/google/uuid v1.3.0
 	github.com/sirupsen/logrus v1.9.0
 	google.golang.org/grpc v1.51.0
@@ -19,4 +19,4 @@ require (
 	google.golang.org/protobuf v1.28.1 // indirect
 )
 
-replace github.com/dkrizic/proto-demo/api => ../api
+replace github.com/dkrizic/todo/api => ../api

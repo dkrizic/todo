@@ -2,7 +2,7 @@ package memory
 
 import (
 	"context"
-	todo "github.com/dkrizic/proto-demo/api"
+	todo "github.com/dkrizic/todo/api"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/exp/maps"
 )
@@ -14,7 +14,7 @@ type server struct {
 }
 
 func NewServer() *server {
-	log.Info("Creating new server")
+	log.Info("Creating new memory server")
 	myServer := &server{}
 	// ensure server implements the inteface
 	var _ todo.ToDoServiceServer = myServer
