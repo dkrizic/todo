@@ -42,3 +42,4 @@ replace github.com/dkrizic/todo/api => ../api
 replace github.com/dkrizic/todo/server/memory => ./memory
 
 replace github.com/dkrizic/todo/server/cmd => ./cmd
+replace "github.com/dkrizic/todo/server/backend" => "./backend"

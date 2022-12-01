@@ -14,7 +14,7 @@ type server struct {
 }
 
 func NewServer() *server {
-	log.Info("Creating new server")
+	log.Info("Creating new memory server")
 	myServer := &server{}
 	// ensure server implements the inteface
 	var _ todo.ToDoServiceServer = myServer
