@@ -22,6 +22,13 @@ type Backend struct {
 }
 
 func (backend Backend) Start() (err error) {
+	log.WithFields(log.Fields{
+		"httpPort":       backend.HttpPort,
+		"grpcPort":       backend.GrpcPort,
+		"healthPort":     backend.HealthPort,
+		"metricsPort":    backend.MetricsPort,
+		"implementation": backend.Implementation,
+	}).Info("Starting backend")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", backend.GrpcPort))
 	if err != nil {
 		log.WithField("grpcPort", backend.GrpcPort).WithError(err).Fatal("Failed to listen")
