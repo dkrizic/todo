@@ -41,5 +41,5 @@ It will not work if there are multiple instances running concurrently.`,
 
 func init() {
 	serveCmd.AddCommand(memoryCmd)
-	memoryCmd.Flags().IntP(maxEntriesFlag, "m", 100, "The maximum number of entries to store in memory")
+	memoryCmd.Flags().IntP(maxEntriesFlag, "", 100, "The maximum number of entries to store in memory")
 }
