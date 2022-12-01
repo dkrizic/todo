@@ -6,8 +6,10 @@ import (
 )
 
 const (
-	httpPortFlag = "http-port"
-	grpcPortFlag = "grpc-port"
+	httpPortFlag    = "http-port"
+	grpcPortFlag    = "grpc-port"
+	healthPortFlag  = "health-port"
+	metricsPortFlag = "metrics-port"
 )
 
 // serveCmd represents the serve command
@@ -25,6 +27,10 @@ func init() {
 
 	serveCmd.PersistentFlags().IntP(httpPortFlag, "p", 8080, "The port to listen on for HTTP requests")
 	serveCmd.PersistentFlags().IntP(grpcPortFlag, "g", 9090, "The port to listen on for gRPC requests")
+	serveCmd.PersistentFlags().IntP(healthPortFlag, "c", 8081, "The port to listen on for health requests")
+	serveCmd.PersistentFlags().IntP(metricsPortFlag, "m", 8082, "The port to listen on for metrics requests")
 	viper.BindEnv(httpPortFlag, "TODO_HTTP_PORT")
 	viper.BindEnv(grpcPortFlag, "TODO_GRPC_PORT")
+	viper.BindEnv(healthPortFlag, "TODO_HEALTH_PORT")
+	viper.BindEnv(metricsPortFlag, "TODO_METRICS_PORT")
 }

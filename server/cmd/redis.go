@@ -22,22 +22,28 @@ var redisCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
 		httpPort, _ := cmd.Flags().GetInt(httpPortFlag)
 		grpcPort, _ := cmd.Flags().GetInt(grpcPortFlag)
+		healthPort, _ := cmd.Flags().GetInt(healthPortFlag)
+		metricsPort, _ := cmd.Flags().GetInt(metricsPortFlag)
 		redisHost, _ := cmd.Flags().GetString(redisHostFlag)
 		redisPort, _ := cmd.Flags().GetInt(redisPortFlag)
 		redisUser, _ := cmd.Flags().GetString(redisUserFlag)
 		redisPass, _ := cmd.Flags().GetString(redisPassFlag)
 
 		log.WithFields(log.Fields{
-			"httpPort":  httpPort,
-			"grpcPort":  grpcPort,
-			"redisHost": redisHost,
-			"redisPort": redisPort,
-			"redisUser": redisUser,
+			"httpPort":    httpPort,
+			"grpcPort":    grpcPort,
+			"healthPort":  healthPort,
+			"metricsPort": metricsPort,
+			"redisHost":   redisHost,
+			"redisPort":   redisPort,
+			"redisUser":   redisUser,
 		}).Info("Starting redis backend")
 
 		return backend.Backend{
-			HttpPort: httpPort,
-			GrpcPort: grpcPort,
+			HttpPort:    httpPort,
+			GrpcPort:    grpcPort,
+			HealthPort:  healthPort,
+			MetricsPort: metricsPort,
 			Implementation: redis.NewServer(&redis.Config{
 				Host: redisHost,
 				Port: redisPort,
