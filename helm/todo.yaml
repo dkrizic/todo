@@ -1,3 +1,4 @@
+replicaCount: 2
 image:
   pullPolicy: Always
 resources:
@@ -54,3 +55,8 @@ backend:
 metrics:
   serviceMonitor:
     enabled: true
+podAnnotations:
+  dapr.io/app-id: todo
+  dapr.io/app-port: "8080"
+  dapr.io/enabled: "true"
+  dapr.io/metrics-port: "9091"
