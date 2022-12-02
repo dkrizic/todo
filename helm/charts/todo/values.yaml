@@ -117,3 +117,7 @@ backend:
     user: ""
     password: ""
     db: 0
+
+metrics:
+  serviceMonitor:
+    enabled: false
