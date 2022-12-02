@@ -51,3 +51,6 @@ backend:
   type: redis
   redis:
     host: redis-master
+metrics:
+  serviceMonitor:
+    enabled: true

@@ -1,0 +1,19 @@
+{{- if .Values.metrics.serviceMonitor.enabled -}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "todo.fullname" . }}
+  labels:
+    app: {{ include "todo.fullname" . }}
+spec:
+  endpoints:
+    - interval: 30s
+      port: metrics
+  namespaceSelector:
+    matchNames:
+      - {{ include "todo.fullname" . }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ include "todo.fullname" . }}
+      app.kubernetes.io/name: {{ include "todo.fullname" . }}
+{{- end -}}
