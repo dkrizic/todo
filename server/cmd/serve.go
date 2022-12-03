@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"github.com/dkrizic/todo/server/notification"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -15,6 +17,8 @@ const (
 	notificationTopicNameFlag  = "notification-topic-name"
 )
 
+var notificationClient *notification.Notification
+
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
 	Use:   "serve",
@@ -23,6 +27,28 @@ var serveCmd = &cobra.Command{
 memory, redis, etc. This command will start the service with the
 given backend.`,
 	ValidArgs: []string{"memory", "redis"},
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		enabled := viper.GetBool(notificationEnabledFlag)
+		pubsubName := viper.GetString(notificationPubSubNameFlag)
+		topicName := viper.GetString(notificationTopicNameFlag)
+		llog := log.WithFields(log.Fields{
+			"enabled":    enabled,
+			"pubsubName": pubsubName,
+			"topicName":  topicName,
+		})
+		llog.Info("Creating notification client")
+		var err error
+		notificationClient, err = notification.NewNotification(
+			enabled,
+			pubsubName,
+			topicName,
+		)
+		if err != nil {
+			llog.WithError(err).Warn("Unable to create notification client")
+			return err
+		}
+		return nil
+	},
 }
 
 func init() {
@@ -33,7 +59,7 @@ func init() {
 	serveCmd.PersistentFlags().IntP(healthPortFlag, "c", 8081, "The port to listen on for health requests")
 	serveCmd.PersistentFlags().IntP(metricsPortFlag, "m", 8082, "The port to listen on for metrics requests")
 	serveCmd.PersistentFlags().BoolP(notificationEnabledFlag, "n", false, "Enable notifications")
-	serveCmd.PersistentFlags().StringP(notificationPubSubNameFlag, "", "pubsub", "The name of the pubsub component to use for notifications")
+	serveCmd.PersistentFlags().StringP(notificationPubSubNameFlag, "", "todo-pubsub", "The name of the pubsub component to use for notifications")
 	serveCmd.PersistentFlags().StringP(notificationTopicNameFlag, "", "todo", "The name of the topic to use for notifications")
 	viper.BindEnv(httpPortFlag, "TODO_HTTP_PORT")
 	viper.BindEnv(grpcPortFlag, "TODO_GRPC_PORT")
