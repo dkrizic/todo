@@ -14,3 +14,6 @@ data:
   TODO_REDIS_USER: "{{ .Values.backend.redis.user }}"
   TODO_REDIS_DB: "{{ .Values.backend.redis.db | toString}}"
   TODO_MEMORY_MAXENTRIES: "{{ .Values.backend.memory.maxEntries | toString}}"
+  TODO_NOTIFICATIONS_ENABLED: "{{ .Values.notifications.enabled | toString }}"
+  TODO_NOTIFICATIONS_PUBSUB_NAME: "{{ .Values.notifications.pubsub.name }}"
+  TODO_NOTIFICATIONS_PUBSUB_TOPIC: "{{ .Values.notifications.pubsub.topic }}"

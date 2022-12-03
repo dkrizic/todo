@@ -8,13 +8,13 @@ import (
 )
 
 const (
-	httpPortFlag               = "http-port"
-	grpcPortFlag               = "grpc-port"
-	healthPortFlag             = "health-port"
-	metricsPortFlag            = "metrics-port"
-	notificationEnabledFlag    = "notification-enabled"
-	notificationPubSubNameFlag = "notification-pubsub-name"
-	notificationTopicNameFlag  = "notification-topic-name"
+	httpPortFlag                 = "http-port"
+	grpcPortFlag                 = "grpc-port"
+	healthPortFlag               = "health-port"
+	metricsPortFlag              = "metrics-port"
+	notificationsEnabledFlag     = "notification-enabled"
+	notificationsPubSubNameFlag  = "notification-pubsub-name"
+	notificationsPubSubTopicFlag = "notification-pubsub-topic"
 )
 
 var notificationClient *notification.Notification
@@ -28,9 +28,9 @@ memory, redis, etc. This command will start the service with the
 given backend.`,
 	ValidArgs: []string{"memory", "redis"},
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		enabled := viper.GetBool(notificationEnabledFlag)
-		pubsubName := viper.GetString(notificationPubSubNameFlag)
-		topicName := viper.GetString(notificationTopicNameFlag)
+		enabled := viper.GetBool(notificationsEnabledFlag)
+		pubsubName := viper.GetString(notificationsPubSubNameFlag)
+		topicName := viper.GetString(notificationsPubSubTopicFlag)
 		llog := log.WithFields(log.Fields{
 			"enabled":    enabled,
 			"pubsubName": pubsubName,
@@ -58,14 +58,14 @@ func init() {
 	serveCmd.PersistentFlags().IntP(grpcPortFlag, "g", 9090, "The port to listen on for gRPC requests")
 	serveCmd.PersistentFlags().IntP(healthPortFlag, "c", 8081, "The port to listen on for health requests")
 	serveCmd.PersistentFlags().IntP(metricsPortFlag, "m", 8082, "The port to listen on for metrics requests")
-	serveCmd.PersistentFlags().BoolP(notificationEnabledFlag, "n", false, "Enable notifications")
-	serveCmd.PersistentFlags().StringP(notificationPubSubNameFlag, "", "todo-pubsub", "The name of the pubsub component to use for notifications")
-	serveCmd.PersistentFlags().StringP(notificationTopicNameFlag, "", "todo", "The name of the topic to use for notifications")
+	serveCmd.PersistentFlags().BoolP(notificationsEnabledFlag, "n", false, "Enable notifications")
+	serveCmd.PersistentFlags().StringP(notificationsPubSubNameFlag, "", "todo-pubsub", "The name of the pubsub component to use for notifications")
+	serveCmd.PersistentFlags().StringP(notificationsPubSubTopicFlag, "", "todo", "The name of the topic to use for notifications")
 	viper.BindEnv(httpPortFlag, "TODO_HTTP_PORT")
 	viper.BindEnv(grpcPortFlag, "TODO_GRPC_PORT")
 	viper.BindEnv(healthPortFlag, "TODO_HEALTH_PORT")
 	viper.BindEnv(metricsPortFlag, "TODO_METRICS_PORT")
-	viper.BindEnv(notificationEnabledFlag, "TODO_NOTIFICATION_ENABLED")
-	viper.BindEnv(notificationPubSubNameFlag, "TODO_NOTIFICATION_PUBSUB_NAME")
-	viper.BindEnv(notificationTopicNameFlag, "TODO_NOTIFICATION_TOPIC_NAME")
+	viper.BindEnv(notificationsEnabledFlag, "TODO_NOTIFICATIONS_ENABLED")
+	viper.BindEnv(notificationsPubSubNameFlag, "TODO_NOTIFICATIONS_PUBSUB_NAME")
+	viper.BindEnv(notificationsPubSubTopicFlag, "TODO_NOTIFICATIONS_PUBSUB_TOPIC")
 }

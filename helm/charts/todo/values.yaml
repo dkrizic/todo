@@ -121,3 +121,9 @@ backend:
 metrics:
   serviceMonitor:
     enabled: false
+
+notifications:
+  enabled: false
+  pubsub:
+    name: "todo-pubsub"
+    topic: "todo"

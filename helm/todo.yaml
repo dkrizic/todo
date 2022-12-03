@@ -60,3 +60,5 @@ podAnnotations:
   dapr.io/app-port: "8080"
   dapr.io/enabled: "true"
   dapr.io/metrics-port: "9091"
+notifications:
+  enabled: true
