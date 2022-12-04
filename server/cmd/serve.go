@@ -47,6 +47,9 @@ given backend.`,
 			llog.WithError(err).Warn("Unable to create notification client")
 			return err
 		}
+		if notificationClient.Enabled {
+			notificationClient.SendNotification(([]byte)("Hello from Dapr"))
+		}
 		return nil
 	},
 }
