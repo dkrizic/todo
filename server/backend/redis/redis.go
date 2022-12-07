@@ -128,3 +128,7 @@ func (s *server) Delete(ctx context.Context, req *todo.DeleteRequest) (resp *tod
 		Id:  req.Id,
 	}, nil
 }
+
+func (redis *server) read(ctx context.Context, key string) (string, error) {
+	return redis.redis.Get(ctx, key).Result()
+}
