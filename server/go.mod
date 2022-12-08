@@ -48,7 +48,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/dkrizic/todo/api => ../api
+replace github.com/dkrizic/todo/api/todo => ../api/todo
 
 replace github.com/dkrizic/todo/server/memory => ./backend/memory
 
