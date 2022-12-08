@@ -36,7 +36,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/apiGetAllResponse"
+              "$ref": "#/definitions/todoGetAllResponse"
             }
           },
           "default": {
@@ -64,7 +64,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/apiCreateOrUpdateResponse"
+              "$ref": "#/definitions/todoCreateOrUpdateResponse"
             }
           },
           "default": {
@@ -80,7 +80,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/apiCreateOrUpdateRequest"
+              "$ref": "#/definitions/todoCreateOrUpdateRequest"
             }
           }
         ],
@@ -96,7 +96,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/apiGetResponse"
+              "$ref": "#/definitions/todoGetResponse"
             }
           },
           "default": {
@@ -130,7 +130,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/apiDeleteResponse"
+              "$ref": "#/definitions/todoDeleteResponse"
             }
           },
           "default": {
@@ -166,7 +166,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/apiCreateOrUpdateResponse"
+              "$ref": "#/definitions/todoCreateOrUpdateResponse"
             }
           },
           "default": {
@@ -219,82 +219,6 @@
     }
   },
   "definitions": {
-    "apiCreateOrUpdateRequest": {
-      "type": "object",
-      "properties": {
-        "api": {
-          "type": "string"
-        },
-        "todo": {
-          "$ref": "#/definitions/apiToDo"
-        }
-      }
-    },
-    "apiCreateOrUpdateResponse": {
-      "type": "object",
-      "properties": {
-        "api": {
-          "type": "string"
-        },
-        "todo": {
-          "$ref": "#/definitions/apiToDo"
-        }
-      }
-    },
-    "apiDeleteResponse": {
-      "type": "object",
-      "properties": {
-        "api": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        }
-      }
-    },
-    "apiGetAllResponse": {
-      "type": "object",
-      "properties": {
-        "api": {
-          "type": "string"
-        },
-        "todos": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/apiToDo"
-          }
-        }
-      }
-    },
-    "apiGetResponse": {
-      "type": "object",
-      "properties": {
-        "api": {
-          "type": "string"
-        },
-        "todo": {
-          "$ref": "#/definitions/apiToDo"
-        }
-      }
-    },
-    "apiToDo": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "reminder": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -319,6 +243,82 @@
           "items": {
             "$ref": "#/definitions/protobufAny"
           }
+        }
+      }
+    },
+    "todoCreateOrUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "type": "string"
+        },
+        "todo": {
+          "$ref": "#/definitions/todoToDo"
+        }
+      }
+    },
+    "todoCreateOrUpdateResponse": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "type": "string"
+        },
+        "todo": {
+          "$ref": "#/definitions/todoToDo"
+        }
+      }
+    },
+    "todoDeleteResponse": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "todoGetAllResponse": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "type": "string"
+        },
+        "todos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/todoToDo"
+          }
+        }
+      }
+    },
+    "todoGetResponse": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "type": "string"
+        },
+        "todo": {
+          "$ref": "#/definitions/todoToDo"
+        }
+      }
+    },
+    "todoToDo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "reminder": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     }
