@@ -2,8 +2,8 @@ package redis
 
 import (
 	"context"
-	todo "github.com/dkrizic/todo/api"
-	"github.com/go-redis/redis/v9"
+	"github.com/dkrizic/todo/api/todo"
+	redis "github.com/go-redis/redis/v9"
 	log "github.com/sirupsen/logrus"
 	"strconv"
 )
