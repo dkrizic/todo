@@ -2,7 +2,7 @@ package backend
 
 import (
 	"fmt"
-	todo "github.com/dkrizic/todo"
+	"github.com/dkrizic/todo/api/todo"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"

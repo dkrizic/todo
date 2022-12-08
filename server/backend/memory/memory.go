@@ -2,7 +2,7 @@ package memory
 
 import (
 	"context"
-	todo "github.com/dkrizic/todo/api"
+	"github.com/dkrizic/todo/api/todo"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/exp/maps"
 )

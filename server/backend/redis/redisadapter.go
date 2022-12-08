@@ -1,8 +1,8 @@
 package redis
 
 import (
-	todo "github.com/dkrizic/todo/api"
-	"github.com/go-redis/redis/v9"
+	"github.com/dkrizic/todo/api/todo"
+	redis "github.com/go-redis/redis/v9"
 	"golang.org/x/net/context"
 )
 
