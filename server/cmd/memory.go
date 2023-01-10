@@ -43,7 +43,7 @@ It will not work if there are multiple instances running concurrently.`,
 
 		memory := memory.NewServer(maxEntries)
 
-		sender, err := sender.NewSender(pubsubName, topicName, notificationsEnabled)
+		sender, err := sender.NewSender(pubsubName, topicName)
 		if err != nil {
 			return err
 		}
