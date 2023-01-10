@@ -6,6 +6,6 @@ spec:
   topic: echo
   route: /notification
   pubsubname: todo-pubsub
-scopes:
-  - echo
+#scopes:
+#  - echo
 
