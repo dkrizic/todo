@@ -7,25 +7,17 @@ import (
 )
 
 type Sender struct {
-	Enabled    bool
 	client     client.Client
 	PubSubName string
 	TopicName  string
 }
 
-func NewSender(pubSubName string, topicName string, enabled bool) (notification *Sender, err error) {
+func NewSender(pubSubName string, topicName string) (notification *Sender, err error) {
 	if err != nil {
 		return nil, err
 	}
 	var daprClient client.Client
-	if enabled {
-		daprClient, err = client.NewClient()
-		if err != nil {
-			return nil, err
-		}
-	}
 	return &Sender{
-		Enabled:    enabled,
 		client:     daprClient,
 		PubSubName: pubSubName,
 		TopicName:  topicName,
@@ -33,10 +25,6 @@ func NewSender(pubSubName string, topicName string, enabled bool) (notification 
 }
 
 func (n *Sender) SendNotification(message []byte) error {
-	if !n.Enabled {
-		log.Debug("Sender is disabled")
-		return nil
-	}
 	llog := log.WithFields(log.Fields{
 		"pubsubName": n.PubSubName,
 		"topicName":  n.TopicName,

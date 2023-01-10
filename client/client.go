@@ -6,11 +6,13 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
 	log.Info("Starting app")
-	cc, err := grpc.Dial("localhost:9090", grpc.WithInsecure())
+	// cc, err := grpc.Dial("localhost:9090", grpc.WithInsecure())
+	cc, err := grpc.Dial("todo.krizic.net:443", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.WithError(err).Fatal("Error connecting to server")
 	}
