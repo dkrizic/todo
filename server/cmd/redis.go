@@ -59,7 +59,11 @@ var redisCmd = &cobra.Command{
 			Pass: redisPass,
 		})
 
-		notification := notification.NewServer(redis, sender)
+		notification := notification.NewServer(&notification.NotificationConfig{
+			Sender:   sender,
+			Original: redis,
+			Enabled:  notificationsEnabled,
+		})
 
 		return backend.Backend{
 			HttpPort:       httpPort,
