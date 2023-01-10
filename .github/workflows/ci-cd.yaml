@@ -109,10 +109,10 @@ jobs:
 
       # Build docker image
       - name: Build docker image
-        run:  docker build -t ${{ env.REGISTRY}}/${{ github.actor }}/todo-server-amd64:latest -f server/docker/Dockerfile --build-arg ARCH=amd64 .
+        run:  docker build -t ${{ env.REGISTRY}}/${{ github.actor }}/echo-amd64:latest -f server/docker/Dockerfile --build-arg ARCH=amd64 .
 
       - name: Push docker image
-        run: docker push ${{ env.REGISTRY}}/${{ github.actor }}/todo-server-amd64:latest
+        run: docker push ${{ env.REGISTRY}}/${{ github.actor }}/echo-amd64:latest
 
   ci-echo-arm64:
     runs-on: ubuntu-latest
@@ -130,10 +130,10 @@ jobs:
 
       # Build docker image
       - name: Build docker image
-        run:  docker build -t ${{ env.REGISTRY}}/${{ github.actor }}/todo-server-arm64:latest -f server/docker/Dockerfile --build-arg ARCH=arm64 .
+        run:  docker build -t ${{ env.REGISTRY}}/${{ github.actor }}/echo-arm64:latest -f server/docker/Dockerfile --build-arg ARCH=arm64 .
 
       - name: Push docker image
-        run: docker push ${{ env.REGISTRY}}/${{ github.actor }}/todo-server-arm64:latest
+        run: docker push ${{ env.REGISTRY}}/${{ github.actor }}/echo-arm64:latest
 
   ci-echo-multiarch:
     runs-on: ubuntu-latest
@@ -148,9 +148,9 @@ jobs:
 
       - name: Create multiarch manifest
         run: |
-          docker manifest create ${{ env.REGISTRY}}/${{ github.actor }}/todo-server:latest ${{ env.REGISTRY}}/${{ github.actor }}/todo-server-amd64:latest ${{ env.REGISTRY}}/${{ github.actor }}/todo-server-arm64:latest
-          docker manifest annotate ${{ env.REGISTRY}}/${{ github.actor }}/todo-server:latest ${{ env.REGISTRY}}/${{ github.actor }}/todo-server-arm64:latest --os linux --arch arm64
-          docker manifest annotate ${{ env.REGISTRY}}/${{ github.actor }}/todo-server:latest ${{ env.REGISTRY}}/${{ github.actor }}/todo-server-amd64:latest --os linux --arch amd64
+          docker manifest create ${{ env.REGISTRY}}/${{ github.actor }}/echo:latest ${{ env.REGISTRY}}/${{ github.actor }}/echo-amd64:latest ${{ env.REGISTRY}}/${{ github.actor }}/echo-arm64:latest
+          docker manifest annotate ${{ env.REGISTRY}}/${{ github.actor }}/echo:latest ${{ env.REGISTRY}}/${{ github.actor }}/echo-arm64:latest --os linux --arch arm64
+          docker manifest annotate ${{ env.REGISTRY}}/${{ github.actor }}/echo:latest ${{ env.REGISTRY}}/${{ github.actor }}/echo-amd64:latest --os linux --arch amd64
 
       - name: Push multiarch manifest
-        run: docker manifest push ${{ env.REGISTRY}}/${{ github.actor }}/todo-server:latest
+        run: docker manifest push ${{ env.REGISTRY}}/${{ github.actor }}/echo:latest
