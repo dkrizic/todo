@@ -13,10 +13,10 @@ type Sender struct {
 }
 
 func NewSender(pubSubName string, topicName string) (notification *Sender, err error) {
+	daprClient, err := client.NewClient()
 	if err != nil {
 		return nil, err
 	}
-	var daprClient client.Client
 	return &Sender{
 		client:     daprClient,
 		PubSubName: pubSubName,
