@@ -48,7 +48,11 @@ It will not work if there are multiple instances running concurrently.`,
 			return err
 		}
 
-		notification := notification.NewServer(memory, sender)
+		notification := notification.NewServer(&notification.NotificationConfig{
+			Sender:   sender,
+			Original: memory,
+			Enabled:  notificationsEnabled,
+		})
 
 		backend := backend.Backend{
 			HttpPort:       httpPort,

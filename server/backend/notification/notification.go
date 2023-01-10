@@ -15,10 +15,17 @@ type server struct {
 	enabled  bool
 }
 
-func NewServer(original todo.ToDoServiceServer, sender *sender.Sender) *server {
+type NotificationConfig struct {
+	Original todo.ToDoServiceServer
+	Sender   *sender.Sender
+	Enabled  bool
+}
+
+func NewServer(config *NotificationConfig) *server {
 	myServer := &server{
-		original: original,
-		sender:   sender,
+		original: config.Original,
+		sender:   config.Sender,
+		enabled:  config.Enabled,
 	}
 	// ensure server implements the interface
 	var _ todo.ToDoServiceServer = myServer
