@@ -41,7 +41,7 @@ func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 				Before: nil,
 				After:  resp.GetTodo(),
 			}
-			err2 := send(change)
+			err2 := s.send(change)
 			if err2 != nil {
 				log.WithError(err2).Warn("Failed to send notification")
 			}
@@ -65,12 +65,13 @@ func (s *server) Delete(ctx context.Context, req *todo.DeleteRequest) (resp *tod
 	return s.original.Delete(ctx, req)
 }
 
-func send(change todo.Change) (err error) {
+func (s *server) send(change todo.Change) (err error) {
 	data, err := convert(change)
 	if err != nil {
 		return err
 	}
 	log.WithField("change", string(data)).Info("Sending notification")
+	err = s.sender.SendNotification(data)
 	return nil
 }
 
