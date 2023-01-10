@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+	todo "github.com/dkrizic/todo/api/todo"
 	"github.com/gorilla/mux"
 	muxlogrus "github.com/pytimer/mux-logrus"
 	log "github.com/sirupsen/logrus"
-	"io"
 	"net/http"
 	"time"
 )
@@ -39,23 +41,23 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func NotificationHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	// convert request body to string
-	bytes, err := io.ReadAll(r.Body)
+	event, err := cloudevents.NewEventFromHTTPRequest(r)
 	if err != nil {
-		log.WithError(err).WithField("body", r.Body).Error("Failed to read request body")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		log.Print("failed to parse CloudEvent from request: %v", err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 	}
-	data := string(bytes)
-
-	// log request body as json
+	log.WithField("event", event).WithField("data", event.Data()).Info("Received event")
+	var change todo.Change
+	json.Unmarshal(event.Data(), &change)
 	log.WithFields(log.Fields{
-		"body": data,
-		"url":  r.URL.Path,
-	}).Info("Notification")
+		"beforeId":          change.Before.Id,
+		"beforeTitle":       change.Before.Title,
+		"beforeDescription": change.Before.Description,
+		"afterId":           change.After.Id,
+		"afterTitle":        change.After.Title,
+		"afterDescription":  change.After.Description,
+	}).Info("Received event")
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok"))
 }
