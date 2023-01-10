@@ -43,8 +43,9 @@ func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 	if err == nil {
 		if s.enabled {
 			change := todo.Change{
-				Before: before.Todo,
-				After:  resp.Todo,
+				Before:     before.Todo,
+				After:      resp.Todo,
+				ChangeType: todo.ChangeType_CREATE,
 			}
 			err2 := s.send(change)
 			if err2 != nil {
@@ -65,8 +66,9 @@ func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 	if err == nil {
 		if s.enabled {
 			change := todo.Change{
-				Before: before.Todo,
-				After:  resp.Todo,
+				Before:     before.Todo,
+				After:      resp.Todo,
+				ChangeType: todo.ChangeType_UPDATE,
 			}
 			err2 := s.send(change)
 			if err2 != nil {
@@ -94,8 +96,9 @@ func (s *server) Delete(ctx context.Context, req *todo.DeleteRequest) (resp *tod
 	if err == nil {
 		if s.enabled {
 			change := todo.Change{
-				Before: before.Todo,
-				After:  nil,
+				Before:     before.Todo,
+				After:      nil,
+				ChangeType: todo.ChangeType_DELETE,
 			}
 			err2 := s.send(change)
 			if err2 != nil {
