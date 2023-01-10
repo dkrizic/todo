@@ -1,11 +1,10 @@
 apiVersion: dapr.io/v1alpha1
 kind: Subscription
 metadata:
-  name: order
+  name: echo-subscription
 spec:
-  topic: echo
+  topic: todo
   route: /notification
   pubsubname: todo-pubsub
 scopes:
   - echo
-
