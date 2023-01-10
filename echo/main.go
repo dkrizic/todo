@@ -46,7 +46,18 @@ func NotificationHandler(w http.ResponseWriter, r *http.Request) {
 		log.Print("failed to parse CloudEvent from request: %v", err)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 	}
-	log.WithField("event", event).WithField("data", event.Data()).Info("Received event")
+	log.WithFields(log.Fields{
+		"time":            event.Time(),
+		"source":          event.Source(),
+		"type":            event.Type(),
+		"subject":         event.Subject(),
+		"id":              event.ID(),
+		"specversion":     event.SpecVersion(),
+		"datacontenttype": event.DataContentType(),
+		"dataschema":      event.DataSchema(),
+		"data":            string(event.Data()),
+	}).Info("Received event")
+
 	var change todo.Change
 	json.Unmarshal(event.Data(), &change)
 	log.WithFields(log.Fields{
