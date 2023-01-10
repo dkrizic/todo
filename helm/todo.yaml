@@ -1,4 +1,3 @@
-replicaCount: 2
 image:
   pullPolicy: Always
 resources:
@@ -60,6 +59,10 @@ podAnnotations:
   dapr.io/app-port: "8080"
   dapr.io/enabled: "true"
   dapr.io/metrics-port: "9091"
+  dapr.io/sidecar-cpu-limit: "100m"
+  dapr.io/sidecar-memory-limit: "128Mi"
+  dapr.io/sidecar-cpu-request: "100m"
+  dapr.io/sidecar-memory-request: "128Mi"
 notifications:
   enabled: true
 autoscaling:
