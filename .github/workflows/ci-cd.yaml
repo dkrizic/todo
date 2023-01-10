@@ -109,7 +109,7 @@ jobs:
 
       # Build docker image
       - name: Build docker image
-        run:  docker build -t ${{ env.REGISTRY}}/${{ github.actor }}/echo-amd64:latest -f todo/docker/Dockerfile --build-arg ARCH=amd64 .
+        run:  docker build -t ${{ env.REGISTRY}}/${{ github.actor }}/echo-amd64:latest -f echo/docker/Dockerfile --build-arg ARCH=amd64 .
 
       - name: Push docker image
         run: docker push ${{ env.REGISTRY}}/${{ github.actor }}/echo-amd64:latest
@@ -130,7 +130,7 @@ jobs:
 
       # Build docker image
       - name: Build docker image
-        run:  docker build -t ${{ env.REGISTRY}}/${{ github.actor }}/echo-arm64:latest -f todo/docker/Dockerfile --build-arg ARCH=arm64 .
+        run:  docker build -t ${{ env.REGISTRY}}/${{ github.actor }}/echo-arm64:latest -f echo/docker/Dockerfile --build-arg ARCH=arm64 .
 
       - name: Push docker image
         run: docker push ${{ env.REGISTRY}}/${{ github.actor }}/echo-arm64:latest
