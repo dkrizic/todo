@@ -11,7 +11,7 @@ nodeSelector:
   kubernetes.io/arch: arm64
 podAnnotations:
   dapr.io/app-id: todo
-  dapr.io/app-port: "8080"
+  dapr.io/app-port: "8000"
   dapr.io/enabled: "true"
   dapr.io/metrics-port: "9091"
   dapr.io/sidecar-cpu-limit: "100m"
