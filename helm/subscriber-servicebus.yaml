@@ -4,7 +4,7 @@ metadata:
   name: echo-subscription
 spec:
   topic: todo
-  route: /notification
+  route: /sender
   pubsubname: todo-pubsub
 scopes:
   - echo

@@ -1,4 +1,4 @@
-package notification
+package sender
 
 import (
 	"context"
@@ -6,14 +6,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Notification struct {
+type Sender struct {
 	Enabled    bool
 	client     client.Client
 	PubSubName string
 	TopicName  string
 }
 
-func NewNotification(enabled bool, pubSubName string, topicName string) (notification *Notification, err error) {
+func NewSender(enabled bool, pubSubName string, topicName string) (notification *Sender, err error) {
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func NewNotification(enabled bool, pubSubName string, topicName string) (notific
 			return nil, err
 		}
 	}
-	return &Notification{
+	return &Sender{
 		Enabled:    enabled,
 		client:     daprClient,
 		PubSubName: pubSubName,
@@ -32,9 +32,9 @@ func NewNotification(enabled bool, pubSubName string, topicName string) (notific
 	}, nil
 }
 
-func (n *Notification) SendNotification(message []byte) error {
+func (n *Sender) SendNotification(message []byte) error {
 	if !n.Enabled {
-		log.Debug("Notification is disabled")
+		log.Debug("Sender is disabled")
 		return nil
 	}
 	llog := log.WithFields(log.Fields{
@@ -42,10 +42,10 @@ func (n *Notification) SendNotification(message []byte) error {
 		"topicName":  n.TopicName,
 		"message":    string(message),
 	})
-	llog.Debug("Sending notification")
+	llog.Debug("Sending sender")
 	err := n.client.PublishEvent(context.Background(), n.PubSubName, n.TopicName, message)
 	if err != nil {
-		llog.WithError(err).Warn("Unable to send notification")
+		llog.WithError(err).Warn("Unable to send sender")
 		return err
 	}
 	return nil

@@ -3,13 +3,13 @@ package notification
 import (
 	"context"
 	"github.com/dkrizic/todo/api/todo"
-	"github.com/dkrizic/todo/server/notification"
+	"github.com/dkrizic/todo/server/sender"
 )
 
 type server struct {
 	todo.UnimplementedToDoServiceServer
 	original     todo.ToDoServiceServer
-	notification notification.Notification
+	notification sender.Sender
 	enabled      bool
 }
 

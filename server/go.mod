@@ -48,9 +48,8 @@ require (
 )
 
 replace github.com/dkrizic/todo/api/todo => ../api/todo
-
 replace github.com/dkrizic/todo/server/memory => ./backend/memory
-
 replace github.com/dkrizic/todo/server/cmd => ./cmd
-
 replace github.com/dkrizic/todo/server/backend => ./backend
+replace github.com/dkrizic/todo/server/sender => ./sender
+replace github.com/dkrizic/todo/server/backend/notification => ./backend/notification

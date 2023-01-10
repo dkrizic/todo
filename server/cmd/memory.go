@@ -31,13 +31,14 @@ It will not work if there are multiple instances running concurrently.`,
 			"metricsPort": metricsPort,
 			"maxEntries":  maxEntries,
 		}).Info("Starting memory backend")
-		return backend.Backend{
+		backend := backend.Backend{
 			HttpPort:       httpPort,
 			GrpcPort:       grpcPort,
 			HealthPort:     healthPort,
 			MetricsPort:    metricsPort,
 			Implementation: memory.NewServer(),
 		}.Start()
+		return backend
 	},
 }
 

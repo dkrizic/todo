@@ -17,7 +17,7 @@ func main() {
 	log.Info("Starting app")
 	r := mux.NewRouter()
 	r.HandleFunc("/health", HealthHandler).Methods("GET", "OPTIONS")
-	r.HandleFunc("/notification", NotificationHandler).Methods("POST", "OPTIONS")
+	r.HandleFunc("/sender", NotificationHandler).Methods("POST", "OPTIONS")
 	http.Handle("/", r)
 	r.Use(muxlogrus.NewLogger().Middleware)
 
