@@ -3,8 +3,11 @@ package cmd
 import (
 	"github.com/dkrizic/todo/server/backend"
 	"github.com/dkrizic/todo/server/backend/memory"
+	"github.com/dkrizic/todo/server/backend/notification"
+	"github.com/dkrizic/todo/server/sender"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -24,20 +27,37 @@ It will not work if there are multiple instances running concurrently.`,
 		healthPort, _ := serveCmd.PersistentFlags().GetInt(healthPortFlag)
 		metricsPort, _ := serveCmd.PersistentFlags().GetInt(metricsPortFlag)
 		maxEntries, _ := cmd.Flags().GetInt(maxEntriesFlag)
+		notificationsEnabled, _ := cmd.Flags().GetBool(notificationsEnabledFlag)
+		pubsubName := viper.GetString(notificationsPubSubNameFlag)
+		topicName := viper.GetString(notificationsPubSubTopicFlag)
 		log.WithFields(log.Fields{
-			"httpPort":    httpPort,
-			"grpcPort":    grpcPort,
-			"healthPort":  healthPort,
-			"metricsPort": metricsPort,
-			"maxEntries":  maxEntries,
+			"httpPort":             httpPort,
+			"grpcPort":             grpcPort,
+			"healthPort":           healthPort,
+			"metricsPort":          metricsPort,
+			"maxEntries":           maxEntries,
+			"notificationsEnabled": notificationsEnabled,
+			"pubsubName":           pubsubName,
+			"topicName":            topicName,
 		}).Info("Starting memory backend")
-		return backend.Backend{
+
+		memory := memory.NewServer(maxEntries)
+
+		sender, err := sender.NewSender(pubsubName, topicName, notificationsEnabled)
+		if err != nil {
+			return err
+		}
+
+		notification := notification.NewServer(memory, sender)
+
+		backend := backend.Backend{
 			HttpPort:       httpPort,
 			GrpcPort:       grpcPort,
 			HealthPort:     healthPort,
 			MetricsPort:    metricsPort,
-			Implementation: memory.NewServer(),
+			Implementation: notification,
 		}.Start()
+		return backend
 	},
 }
 

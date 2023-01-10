@@ -11,14 +11,17 @@ var todoMap = map[string]*todo.ToDo{}
 
 type server struct {
 	todo.UnimplementedToDoServiceServer
+	maxEntries int
 }
 
-func NewServer() *server {
-	log.Info("Creating new memory server")
-	myServer := &server{}
+func NewServer(maxEntries int) *server {
+	log.WithField("maxEntries", maxEntries).Info("Creating new memory server")
+	myServer := &server{
+		maxEntries: maxEntries,
+	}
 	// ensure server implements the inteface
 	var _ todo.ToDoServiceServer = myServer
-	return &server{}
+	return myServer
 }
 
 func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {

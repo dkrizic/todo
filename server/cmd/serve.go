@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/dkrizic/todo/server/notification"
+	"github.com/dkrizic/todo/server/sender"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -12,12 +12,12 @@ const (
 	grpcPortFlag                 = "grpc-port"
 	healthPortFlag               = "health-port"
 	metricsPortFlag              = "metrics-port"
-	notificationsEnabledFlag     = "notification-enabled"
-	notificationsPubSubNameFlag  = "notification-pubsub-name"
-	notificationsPubSubTopicFlag = "notification-pubsub-topic"
+	notificationsEnabledFlag     = "sender-enabled"
+	notificationsPubSubNameFlag  = "sender-pubsub-name"
+	notificationsPubSubTopicFlag = "sender-pubsub-topic"
 )
 
-var notificationClient *notification.Notification
+var senderClient *sender.Sender
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
@@ -36,19 +36,19 @@ given backend.`,
 			"pubsubName": pubsubName,
 			"topicName":  topicName,
 		})
-		llog.Info("Creating notification client")
+		llog.Info("Creating sender client")
 		var err error
-		notificationClient, err = notification.NewNotification(
-			enabled,
+		senderClient, err = sender.NewSender(
 			pubsubName,
 			topicName,
+			enabled,
 		)
 		if err != nil {
-			llog.WithError(err).Warn("Unable to create notification client")
+			llog.WithError(err).Warn("Unable to create sender client")
 			return err
 		}
-		if notificationClient.Enabled {
-			notificationClient.SendNotification(([]byte)("Hello from Dapr"))
+		if senderClient.Enabled {
+			senderClient.SendNotification(([]byte)("Hello from Dapr"))
 		}
 		return nil
 	},

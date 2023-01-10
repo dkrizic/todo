@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"github.com/gorilla/mux"
 	muxlogrus "github.com/pytimer/mux-logrus"
 	log "github.com/sirupsen/logrus"
@@ -16,7 +17,7 @@ func main() {
 	log.Info("Starting app")
 	r := mux.NewRouter()
 	r.HandleFunc("/health", HealthHandler).Methods("GET", "OPTIONS")
-	r.HandleFunc("/notification", NotificationHandler).Methods("POST", "OPTIONS")
+	r.HandleFunc("/sender", NotificationHandler).Methods("POST", "OPTIONS")
 	http.Handle("/", r)
 	r.Use(muxlogrus.NewLogger().Middleware)
 
@@ -42,9 +43,15 @@ func NotificationHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
+
+	// convert request body to string
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(r.Body)
+	body := buf.String()
+
 	// log request body as json
 	log.WithFields(log.Fields{
-		"body": r.Body,
+		"body": body,
 		"url":  r.URL.Path,
 	}).Info("Notification")
 }

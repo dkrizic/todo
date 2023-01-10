@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	todo "github.com/dkrizic/todo/api"
+	todo "github.com/dkrizic/todo/api/todo"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
