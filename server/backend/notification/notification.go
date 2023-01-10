@@ -34,12 +34,17 @@ func NewServer(config *NotificationConfig) *server {
 }
 
 func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
+	before, err3 := s.original.Get(ctx, &todo.GetRequest{Id: req.Todo.Id})
+	if err3 != nil {
+		log.WithError(err3).Error("Failed to get todo before deleting")
+		return nil, err3
+	}
 	resp, err = s.original.Create(ctx, req)
 	if err == nil {
 		if s.enabled {
 			change := todo.Change{
-				Before: nil,
-				After:  resp.GetTodo(),
+				Before: before.Todo,
+				After:  resp.Todo,
 			}
 			err2 := s.send(change)
 			if err2 != nil {
@@ -51,7 +56,25 @@ func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 }
 
 func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
-	return s.original.Update(ctx, req)
+	before, err3 := s.original.Get(ctx, &todo.GetRequest{Id: req.Todo.Id})
+	if err3 != nil {
+		log.WithError(err3).Error("Failed to get todo before deleting")
+		return nil, err3
+	}
+	resp, err = s.original.Update(ctx, req)
+	if err == nil {
+		if s.enabled {
+			change := todo.Change{
+				Before: before.Todo,
+				After:  resp.Todo,
+			}
+			err2 := s.send(change)
+			if err2 != nil {
+				log.WithError(err2).Warn("Failed to send notification")
+			}
+		}
+	}
+	return resp, err
 }
 
 func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *todo.GetAllResponse, err error) {
@@ -62,7 +85,25 @@ func (s *server) Get(ctx context.Context, req *todo.GetRequest) (resp *todo.GetR
 }
 
 func (s *server) Delete(ctx context.Context, req *todo.DeleteRequest) (resp *todo.DeleteResponse, err error) {
-	return s.original.Delete(ctx, req)
+	before, err3 := s.original.Get(ctx, &todo.GetRequest{Id: req.Id})
+	if err3 != nil {
+		log.WithError(err3).Error("Failed to get todo before deleting")
+		return nil, err3
+	}
+	resp, err = s.original.Delete(ctx, req)
+	if err == nil {
+		if s.enabled {
+			change := todo.Change{
+				Before: before.Todo,
+				After:  nil,
+			}
+			err2 := s.send(change)
+			if err2 != nil {
+				log.WithError(err2).Warn("Failed to send notification")
+			}
+		}
+	}
+	return resp, err
 }
 
 func (s *server) send(change todo.Change) (err error) {
