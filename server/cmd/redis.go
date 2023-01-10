@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/dkrizic/todo/server/backend"
+	"github.com/dkrizic/todo/server/backend/notification"
 	"github.com/dkrizic/todo/server/backend/redis"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -28,6 +29,7 @@ var redisCmd = &cobra.Command{
 		redisPort, _ := cmd.Flags().GetInt(redisPortFlag)
 		redisUser, _ := cmd.Flags().GetString(redisUserFlag)
 		redisPass, _ := cmd.Flags().GetString(redisPassFlag)
+		notificationEnabled, _ := cmd.Flags().GetBool(notificationsEnabledFlag)
 
 		log.WithFields(log.Fields{
 			"httpPort":    httpPort,
@@ -46,12 +48,14 @@ var redisCmd = &cobra.Command{
 			Pass: redisPass,
 		})
 
+		notification := notification.NewServer(redis, notificationEnabled)
+
 		return backend.Backend{
 			HttpPort:       httpPort,
 			GrpcPort:       grpcPort,
 			HealthPort:     healthPort,
 			MetricsPort:    metricsPort,
-			Implementation: redis,
+			Implementation: notification,
 		}.Start()
 	},
 }

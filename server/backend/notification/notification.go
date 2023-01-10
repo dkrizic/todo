@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/dkrizic/todo/api/todo"
 	"github.com/dkrizic/todo/server/sender"
+	log "github.com/sirupsen/logrus"
 )
 
 type server struct {
@@ -20,10 +21,12 @@ func NewServer(original todo.ToDoServiceServer, enabled bool) *server {
 	}
 	// ensure server implements the interface
 	var _ todo.ToDoServiceServer = myServer
+	log.WithField("enabled", enabled).Info("Notification server created")
 	return myServer
 }
 
 func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
+	log.Info("Notifcation about creation")
 	return s.original.Create(ctx, req)
 }
 
