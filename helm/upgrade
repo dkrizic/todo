@@ -3,3 +3,4 @@ helm -n todo upgrade --install -f redis.yaml redis bitnami/redis
 helm -n todo upgrade --install -f todo.yaml todo ./charts/todo
 helm -n todo upgrade --install -f echo.yaml echo ./charts/echo
 kubectl -n todo apply -f component-servicebus.yaml
+kubectl -n todo apply -f subscriber-servicebus.yaml
