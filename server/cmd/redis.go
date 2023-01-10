@@ -4,6 +4,7 @@ import (
 	"github.com/dkrizic/todo/server/backend"
 	"github.com/dkrizic/todo/server/backend/notification"
 	"github.com/dkrizic/todo/server/backend/redis"
+	"github.com/dkrizic/todo/server/sender"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -29,17 +30,27 @@ var redisCmd = &cobra.Command{
 		redisPort, _ := cmd.Flags().GetInt(redisPortFlag)
 		redisUser, _ := cmd.Flags().GetString(redisUserFlag)
 		redisPass, _ := cmd.Flags().GetString(redisPassFlag)
-		notificationEnabled, _ := cmd.Flags().GetBool(notificationsEnabledFlag)
+		notificationsEnabled, _ := cmd.Flags().GetBool(notificationsEnabledFlag)
+		pubsubName := viper.GetString(notificationsPubSubNameFlag)
+		topicName := viper.GetString(notificationsPubSubTopicFlag)
 
 		log.WithFields(log.Fields{
-			"httpPort":    httpPort,
-			"grpcPort":    grpcPort,
-			"healthPort":  healthPort,
-			"metricsPort": metricsPort,
-			"redisHost":   redisHost,
-			"redisPort":   redisPort,
-			"redisUser":   redisUser,
+			"httpPort":             httpPort,
+			"grpcPort":             grpcPort,
+			"healthPort":           healthPort,
+			"metricsPort":          metricsPort,
+			"redisHost":            redisHost,
+			"redisPort":            redisPort,
+			"redisUser":            redisUser,
+			"notificationsEnabled": notificationsEnabled,
+			"pubsubName":           pubsubName,
+			"topicName":            topicName,
 		}).Info("Starting redis backend")
+
+		sender, err := sender.NewSender(pubsubName, topicName, notificationsEnabled)
+		if err != nil {
+			return err
+		}
 
 		redis := redis.NewServer(&redis.Config{
 			Host: redisHost,
@@ -48,7 +59,7 @@ var redisCmd = &cobra.Command{
 			Pass: redisPass,
 		})
 
-		notification := notification.NewServer(redis, notificationEnabled)
+		notification := notification.NewServer(redis, sender)
 
 		return backend.Backend{
 			HttpPort:       httpPort,

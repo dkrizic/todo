@@ -39,9 +39,9 @@ given backend.`,
 		llog.Info("Creating sender client")
 		var err error
 		senderClient, err = sender.NewSender(
-			enabled,
 			pubsubName,
 			topicName,
+			enabled,
 		)
 		if err != nil {
 			llog.WithError(err).Warn("Unable to create sender client")

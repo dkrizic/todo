@@ -13,7 +13,7 @@ type Sender struct {
 	TopicName  string
 }
 
-func NewSender(enabled bool, pubSubName string, topicName string) (notification *Sender, err error) {
+func NewSender(pubSubName string, topicName string, enabled bool) (notification *Sender, err error) {
 	if err != nil {
 		return nil, err
 	}

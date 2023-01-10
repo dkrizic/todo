@@ -9,19 +9,19 @@ import (
 
 type server struct {
 	todo.UnimplementedToDoServiceServer
-	original     todo.ToDoServiceServer
-	notification sender.Sender
-	enabled      bool
+	original todo.ToDoServiceServer
+	sender   *sender.Sender
+	enabled  bool
 }
 
-func NewServer(original todo.ToDoServiceServer, enabled bool) *server {
+func NewServer(original todo.ToDoServiceServer, sender *sender.Sender) *server {
 	myServer := &server{
 		original: original,
-		enabled:  enabled,
+		sender:   sender,
 	}
 	// ensure server implements the interface
 	var _ todo.ToDoServiceServer = myServer
-	log.WithField("enabled", enabled).Info("Notification server created")
+	log.Info("Notification server created")
 	return myServer
 }
 
