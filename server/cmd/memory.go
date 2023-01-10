@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/dkrizic/todo/server/backend"
 	"github.com/dkrizic/todo/server/backend/memory"
+	"github.com/dkrizic/todo/server/backend/notification"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -23,6 +24,7 @@ It will not work if there are multiple instances running concurrently.`,
 		grpcPort, _ := serveCmd.PersistentFlags().GetInt(grpcPortFlag)
 		healthPort, _ := serveCmd.PersistentFlags().GetInt(healthPortFlag)
 		metricsPort, _ := serveCmd.PersistentFlags().GetInt(metricsPortFlag)
+		notificationEnabled, _ := serveCmd.PersistentFlags().GetBool(notificationsEnabledFlag)
 		maxEntries, _ := cmd.Flags().GetInt(maxEntriesFlag)
 		log.WithFields(log.Fields{
 			"httpPort":    httpPort,
@@ -34,12 +36,14 @@ It will not work if there are multiple instances running concurrently.`,
 
 		memory := memory.NewServer(maxEntries)
 
+		notification := notification.NewServer(memory, notificationEnabled)
+
 		backend := backend.Backend{
 			HttpPort:       httpPort,
 			GrpcPort:       grpcPort,
 			HealthPort:     healthPort,
 			MetricsPort:    metricsPort,
-			Implementation: memory,
+			Implementation: notification,
 		}.Start()
 		return backend
 	},

@@ -2,8 +2,10 @@ module github.com/dkrizic/todo/client
 
 go 1.19
 
+replace github.com/dkrizic/todo/api/todo => ../api/todo
+
 require (
-	github.com/dkrizic/todo/api v0.0.0-20221130165503-515e25133c41
+	github.com/dkrizic/todo/api/todo v0.0.0-20230110140236-29735055cd79
 	github.com/google/uuid v1.3.0
 	github.com/sirupsen/logrus v1.9.0
 	google.golang.org/grpc v1.51.0
@@ -18,5 +20,3 @@ require (
 	google.golang.org/genproto v0.0.0-20221118155620-16455021b5e6 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 )
-
-replace github.com/dkrizic/todo/api => ../api
