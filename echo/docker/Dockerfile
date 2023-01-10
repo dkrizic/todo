@@ -1,5 +1,6 @@
 FROM golang:1.19 as builder
 ARG ARCH
+COPY /api /build/api
 COPY /echo /build/echo
 WORKDIR /build/echo
 ENV GOOS=linux
