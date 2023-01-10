@@ -16,7 +16,7 @@ func main() {
 	log.Info("Starting app")
 	r := mux.NewRouter()
 	r.HandleFunc("/health", HealthHandler).Methods("GET", "OPTIONS")
-	r.HandleFunc("/todo", TodoNotification).Methods("POST", "OPTIONS")
+	r.HandleFunc("/notification", NotificationHandler).Methods("POST", "OPTIONS")
 	http.Handle("/", r)
 	r.Use(muxlogrus.NewLogger().Middleware)
 
@@ -38,13 +38,12 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("ok"))
 }
 
-func TodoNotification(w http.ResponseWriter, r *http.Request) {
-	log.WithField("url", r.URL.Path).Info("Todo triggered")
+func NotificationHandler(w http.ResponseWriter, r *http.Request) {
+	log.WithField("url", r.URL.Path).Info("Notification triggered")
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-
-	// get order number
-	// number, err := getOrderNumber()
+	// log request body as json
+	log.WithField("body", r.Body).Info("Notification")
 }
