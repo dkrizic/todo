@@ -47,6 +47,7 @@ func NotificationHandler(w http.ResponseWriter, r *http.Request) {
 	// convert request body to string
 	bytes, err := io.ReadAll(r.Body)
 	if err != nil {
+		log.WithError(err).WithField("body", r.Body).Error("Failed to read request body")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
