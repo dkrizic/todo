@@ -1,10 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"github.com/gorilla/mux"
 	muxlogrus "github.com/pytimer/mux-logrus"
 	log "github.com/sirupsen/logrus"
+	"io"
 	"net/http"
 	"time"
 )
@@ -45,13 +45,16 @@ func NotificationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// convert request body to string
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(r.Body)
-	body := buf.String()
+	bytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	data := string(bytes)
 
 	// log request body as json
 	log.WithFields(log.Fields{
-		"body": body,
+		"body": data,
 		"url":  r.URL.Path,
 	}).Info("Notification")
 }
