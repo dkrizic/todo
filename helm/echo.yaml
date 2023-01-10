@@ -18,9 +18,3 @@ podAnnotations:
   dapr.io/sidecar-memory-limit: "128Mi"
   dapr.io/sidecar-cpu-request: "100m"
   dapr.io/sidecar-memory-request: "128Mi"
-autoscaling:
-  enabled: true
-  minReplicas: 2
-  maxReplicas: 5
-  targetCPUUtilizationPercentage: 50
-  targetMemoryUtilizationPercentage: 60
