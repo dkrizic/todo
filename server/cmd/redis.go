@@ -39,17 +39,19 @@ var redisCmd = &cobra.Command{
 			"redisUser":   redisUser,
 		}).Info("Starting redis backend")
 
+		redis := redis.NewServer(&redis.Config{
+			Host: redisHost,
+			Port: redisPort,
+			User: redisUser,
+			Pass: redisPass,
+		})
+
 		return backend.Backend{
-			HttpPort:    httpPort,
-			GrpcPort:    grpcPort,
-			HealthPort:  healthPort,
-			MetricsPort: metricsPort,
-			Implementation: redis.NewServer(&redis.Config{
-				Host: redisHost,
-				Port: redisPort,
-				User: redisUser,
-				Pass: redisPass,
-			}),
+			HttpPort:       httpPort,
+			GrpcPort:       grpcPort,
+			HealthPort:     healthPort,
+			MetricsPort:    metricsPort,
+			Implementation: redis,
 		}.Start()
 	},
 }
