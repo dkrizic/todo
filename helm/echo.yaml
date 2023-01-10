@@ -10,10 +10,9 @@ resources:
 nodeSelector:
   kubernetes.io/arch: arm64
 podAnnotations:
-  dapr.io/app-id: todo
+  dapr.io/app-id: echo
   dapr.io/app-port: "8000"
   dapr.io/enabled: "true"
-  dapr.io/metrics-port: "9091"
   dapr.io/sidecar-cpu-limit: "100m"
   dapr.io/sidecar-memory-limit: "128Mi"
   dapr.io/sidecar-cpu-request: "100m"

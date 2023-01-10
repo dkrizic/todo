@@ -33,17 +33,18 @@ func main() {
 }
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
-	log.WithField("url", r.URL.Path).Trace("Health triggered")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
 }
 
 func NotificationHandler(w http.ResponseWriter, r *http.Request) {
-	log.WithField("url", r.URL.Path).Info("Notification triggered")
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 	// log request body as json
-	log.WithField("body", r.Body).Info("Notification")
+	log.WithFields(log.Fields{
+		"body": r.Body,
+		"url":  r.URL.Path,
+	}).Info("Notification")
 }
