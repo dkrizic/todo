@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"github.com/dkrizic/todo/server/sender"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -27,31 +26,6 @@ var serveCmd = &cobra.Command{
 memory, redis, etc. This command will start the service with the
 given backend.`,
 	ValidArgs: []string{"memory", "redis"},
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		enabled := viper.GetBool(notificationsEnabledFlag)
-		pubsubName := viper.GetString(notificationsPubSubNameFlag)
-		topicName := viper.GetString(notificationsPubSubTopicFlag)
-		llog := log.WithFields(log.Fields{
-			"enabled":    enabled,
-			"pubsubName": pubsubName,
-			"topicName":  topicName,
-		})
-		llog.Info("Creating sender client")
-		var err error
-		senderClient, err = sender.NewSender(
-			pubsubName,
-			topicName,
-			enabled,
-		)
-		if err != nil {
-			llog.WithError(err).Warn("Unable to create sender client")
-			return err
-		}
-		if senderClient.Enabled {
-			senderClient.SendNotification(([]byte)("Hello from Dapr"))
-		}
-		return nil
-	},
 }
 
 func init() {
