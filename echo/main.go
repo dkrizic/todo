@@ -60,14 +60,20 @@ func NotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	var change todo.Change
 	json.Unmarshal(event.Data(), &change)
-	log.WithFields(log.Fields{
-		"beforeId":          change.Before.Id,
-		"beforeTitle":       change.Before.Title,
-		"beforeDescription": change.Before.Description,
-		"afterId":           change.After.Id,
-		"afterTitle":        change.After.Title,
-		"afterDescription":  change.After.Description,
-	}).Info("Received event")
+	if change.Before != nil {
+		log.WithFields(log.Fields{
+			"beforeId":          change.Before.Id,
+			"beforeTitle":       change.Before.Title,
+			"beforeDescription": change.Before.Description,
+		}).Info("Before")
+	}
+	if change.After != nil {
+		log.WithFields(log.Fields{
+			"afterId":          change.After.Id,
+			"afterTitle":       change.After.Title,
+			"afterDescription": change.After.Description,
+		}).Info("After")
+	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
