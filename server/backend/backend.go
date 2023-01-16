@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/dkrizic/todo/api/todo"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	otgrpc "github.com/opentracing-contrib/go-grpc"
+	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
@@ -23,6 +25,7 @@ type Backend struct {
 }
 
 func (backend Backend) Start() (err error) {
+
 	log.WithFields(log.Fields{
 		"httpPort":       backend.HttpPort,
 		"grpcPort":       backend.GrpcPort,
@@ -36,7 +39,14 @@ func (backend Backend) Start() (err error) {
 		return err
 	}
 
+	// create the tracer
+	tracer := opentracing.GlobalTracer()
+
 	s := grpc.NewServer()
+	grpc.UnaryInterceptor(otgrpc.OpenTracingServerInterceptor(tracer))
+	grpc.StreamInterceptor(otgrpc.OpenTracingStreamServerInterceptor(tracer))
+	log.Info("Tracing enabled")
+
 	todo.RegisterToDoServiceServer(s, backend.Implementation)
 	reflection.Register(s)
 	log.WithField("grpcPort", backend.GrpcPort).Info("Serving gRPC")
