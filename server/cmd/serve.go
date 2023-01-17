@@ -59,6 +59,7 @@ given backend.`,
 				log.Fatalf("Could not initialize jaeger tracer: %s", err.Error())
 			}
 			opentracing.SetGlobalTracer(tracer)
+			log.WithField("url", tracingUrl).WithField("implementation", "jaeger").Info("Tracing enabled")
 		} else {
 			log.Info("Tracing disabled")
 		}
