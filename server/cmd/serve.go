@@ -18,7 +18,7 @@ const (
 	notificationsEnabledFlag     = "sender-enabled"
 	notificationsPubSubNameFlag  = "sender-pubsub-name"
 	notificationsPubSubTopicFlag = "sender-pubsub-topic"
-	enableTracingFlag            = "enable-tracing"
+	tracingEnabledFlag           = "tracing-enabled"
 	tracingUrlFlag               = "tracing-url"
 )
 
@@ -34,7 +34,7 @@ var serveCmd = &cobra.Command{
 memory, redis, etc. This command will start the service with the
 given backend.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		tracingEnabled := viper.GetBool(enableTracingFlag)
+		tracingEnabled := viper.GetBool(tracingEnabledFlag)
 		tracingUrl := viper.GetString(tracingUrlFlag)
 		log.WithFields(log.Fields{
 			"tracingEnabled": tracingEnabled,
@@ -81,7 +81,7 @@ func init() {
 	serveCmd.PersistentFlags().BoolP(notificationsEnabledFlag, "n", false, "Enable notifications")
 	serveCmd.PersistentFlags().StringP(notificationsPubSubNameFlag, "", "todo-pubsub", "The name of the pubsub component to use for notifications")
 	serveCmd.PersistentFlags().StringP(notificationsPubSubTopicFlag, "", "todo", "The name of the topic to use for notifications")
-	serveCmd.PersistentFlags().BoolP(enableTracingFlag, "t", false, "Enable tracing")
+	serveCmd.PersistentFlags().BoolP(tracingEnabledFlag, "t", false, "Enable tracing")
 	serveCmd.PersistentFlags().StringP(tracingUrlFlag, "", "http://localhost:14268/api/traces", "The url of the tracing server")
 	viper.BindEnv(httpPortFlag, "TODO_HTTP_PORT")
 	viper.BindEnv(grpcPortFlag, "TODO_GRPC_PORT")
@@ -90,6 +90,6 @@ func init() {
 	viper.BindEnv(notificationsEnabledFlag, "TODO_NOTIFICATIONS_ENABLED")
 	viper.BindEnv(notificationsPubSubNameFlag, "TODO_NOTIFICATIONS_PUBSUB_NAME")
 	viper.BindEnv(notificationsPubSubTopicFlag, "TODO_NOTIFICATIONS_PUBSUB_TOPIC")
-	viper.BindEnv(enableTracingFlag, "TODO_ENABLE_TRACING")
+	viper.BindEnv(tracingEnabledFlag, "TODO_TRACING_ENABLED")
 	viper.BindEnv(tracingUrlFlag, "TODO_TRACING_URL")
 }
