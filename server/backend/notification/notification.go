@@ -47,7 +47,7 @@ func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 				After:      resp.Todo,
 				ChangeType: todo.ChangeType_CREATE,
 			}
-			err2 := s.send(change)
+			err2 := s.send(ctx, change)
 			if err2 != nil {
 				log.WithError(err2).Warn("Failed to send notification")
 			}
@@ -70,7 +70,7 @@ func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 				After:      resp.Todo,
 				ChangeType: todo.ChangeType_UPDATE,
 			}
-			err2 := s.send(change)
+			err2 := s.send(ctx, change)
 			if err2 != nil {
 				log.WithError(err2).Warn("Failed to send notification")
 			}
@@ -100,7 +100,7 @@ func (s *server) Delete(ctx context.Context, req *todo.DeleteRequest) (resp *tod
 				After:      nil,
 				ChangeType: todo.ChangeType_DELETE,
 			}
-			err2 := s.send(change)
+			err2 := s.send(ctx, change)
 			if err2 != nil {
 				log.WithError(err2).Warn("Failed to send notification")
 			}
@@ -109,13 +109,13 @@ func (s *server) Delete(ctx context.Context, req *todo.DeleteRequest) (resp *tod
 	return resp, err
 }
 
-func (s *server) send(change todo.Change) (err error) {
+func (s *server) send(ctx context.Context, change todo.Change) (err error) {
 	data, err := convert(change)
 	if err != nil {
 		return err
 	}
 	log.WithField("change", string(data)).Info("Sending notification")
-	err = s.sender.SendNotification(data)
+	err = s.sender.SendNotification(ctx, data)
 	return nil
 }
 
