@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/dkrizic/todo/api/todo"
 	"github.com/dkrizic/todo/server/sender"
+	"github.com/opentracing/opentracing-go"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -80,7 +81,10 @@ func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 }
 
 func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *todo.GetAllResponse, err error) {
-	return s.original.GetAll(ctx, req)
+	span := opentracing.GlobalTracer().StartSpan("GetAll")
+	resp, err = s.original.GetAll(ctx, req)
+	span.Finish()
+	return resp, err
 }
 func (s *server) Get(ctx context.Context, req *todo.GetRequest) (resp *todo.GetResponse, err error) {
 	return s.original.Get(ctx, req)
