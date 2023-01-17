@@ -6,6 +6,7 @@ import (
 	"github.com/dkrizic/todo/api/todo"
 	"github.com/dkrizic/todo/server/sender"
 	"github.com/opentracing/opentracing-go"
+	splog "github.com/opentracing/opentracing-go/log"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -81,12 +82,14 @@ func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 }
 
 func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *todo.GetAllResponse, err error) {
-	span := opentracing.GlobalTracer().StartSpan("GetAll")
-	resp, err = s.original.GetAll(ctx, req)
-	span.Finish()
-	return resp, err
+	span, ctx := opentracing.StartSpanFromContext(ctx, "notification-GetAll")
+	defer span.Finish()
+	return s.original.GetAll(ctx, req)
 }
 func (s *server) Get(ctx context.Context, req *todo.GetRequest) (resp *todo.GetResponse, err error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "notification-GetAll")
+	defer span.Finish()
+	span.LogFields(splog.String("id", req.Id))
 	return s.original.Get(ctx, req)
 }
 
