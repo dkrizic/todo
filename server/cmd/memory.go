@@ -43,13 +43,15 @@ It will not work if there are multiple instances running concurrently.`,
 
 		memory := memory.NewServer(maxEntries)
 
-		sender, err := sender.NewSender(pubsubName, topicName)
-		if err != nil {
-			return err
+		var senderClient *sender.Sender
+		if notificationsEnabled {
+			senderClient, err = sender.NewSender(pubsubName, topicName)
+			if err != nil {
+				return err
+			}
 		}
-
 		notification := notification.NewServer(&notification.NotificationConfig{
-			Sender:   sender,
+			Sender:   senderClient,
 			Original: memory,
 			Enabled:  notificationsEnabled,
 		})

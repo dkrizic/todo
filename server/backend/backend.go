@@ -39,12 +39,9 @@ func (backend Backend) Start() (err error) {
 		return err
 	}
 
-	// create the tracer
-	tracer := opentracing.GlobalTracer()
-
 	s := grpc.NewServer()
-	grpc.UnaryInterceptor(otgrpc.OpenTracingServerInterceptor(tracer))
-	grpc.StreamInterceptor(otgrpc.OpenTracingStreamServerInterceptor(tracer))
+	grpc.UnaryInterceptor(otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()))
+	grpc.StreamInterceptor(otgrpc.OpenTracingStreamServerInterceptor(opentracing.GlobalTracer()))
 	log.Info("Tracing enabled")
 
 	todo.RegisterToDoServiceServer(s, backend.Implementation)

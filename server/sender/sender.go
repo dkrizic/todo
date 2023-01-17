@@ -38,14 +38,14 @@ func NewSender(pubSubName string, topicName string) (notification *Sender, err e
 	}, nil
 }
 
-func (n *Sender) SendNotification(message []byte) error {
+func (n *Sender) SendNotification(ctx context.Context, message []byte) error {
 	llog := log.WithFields(log.Fields{
 		"pubsubName": n.PubSubName,
 		"topicName":  n.TopicName,
 		"message":    string(message),
 	})
 	llog.Debug("Sending sender")
-	err := n.client.PublishEvent(context.Background(), n.PubSubName, n.TopicName, message)
+	err := n.client.PublishEvent(ctx, n.PubSubName, n.TopicName, message)
 	if err != nil {
 		llog.WithError(err).Warn("Unable to send sender")
 		return err

@@ -64,7 +64,9 @@ given backend.`,
 		}
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
-		closer.Close()
+		if closer != nil {
+			closer.Close()
+		}
 	},
 	ValidArgs: []string{"memory", "redis"},
 }

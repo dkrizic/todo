@@ -47,9 +47,12 @@ var redisCmd = &cobra.Command{
 			"topicName":            topicName,
 		}).Info("Starting redis backend")
 
-		sender, err := sender.NewSender(pubsubName, topicName)
-		if err != nil {
-			return err
+		var senderClient *sender.Sender
+		if notificationsEnabled {
+			senderClient, err = sender.NewSender(pubsubName, topicName)
+			if err != nil {
+				return err
+			}
 		}
 
 		redis := redis.NewServer(&redis.Config{
@@ -60,7 +63,7 @@ var redisCmd = &cobra.Command{
 		})
 
 		notification := notification.NewServer(&notification.NotificationConfig{
-			Sender:   sender,
+			Sender:   senderClient,
 			Original: redis,
 			Enabled:  notificationsEnabled,
 		})
