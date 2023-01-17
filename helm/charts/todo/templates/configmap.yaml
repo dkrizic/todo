@@ -17,3 +17,5 @@ data:
   TODO_NOTIFICATIONS_ENABLED: "{{ .Values.notifications.enabled | toString }}"
   TODO_NOTIFICATIONS_PUBSUB_NAME: "{{ .Values.notifications.pubsub.name }}"
   TODO_NOTIFICATIONS_PUBSUB_TOPIC: "{{ .Values.notifications.pubsub.topic }}"
+  TODO_TRACING_ENABLED: "{{ .Values.tracing.enabled | toString }}"
+  TODO_TRACING_URL: "{{ .Values.tracing.url }}"
