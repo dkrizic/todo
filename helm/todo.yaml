@@ -54,6 +54,8 @@ backend:
 metrics:
   serviceMonitor:
     enabled: true
+deploymentAnnotations:
+  sidecar.jaegertracing.io/inject: jaeger
 podAnnotations:
   dapr.io/app-id: todo
   dapr.io/app-port: "8080"
@@ -63,6 +65,7 @@ podAnnotations:
   dapr.io/sidecar-memory-limit: "128Mi"
   dapr.io/sidecar-cpu-request: "100m"
   dapr.io/sidecar-memory-request: "128Mi"
+  dapr.io/config: "tracing"
 notifications:
   enabled: true
 autoscaling:

@@ -9,6 +9,8 @@ resources:
       memory: 128Mi
 nodeSelector:
   kubernetes.io/arch: arm64
+deploymentAnnotations:
+  sidecar.jaegertracing.io/inject: jaeger
 podAnnotations:
   dapr.io/app-id: echo
   dapr.io/app-port: "8000"
@@ -17,3 +19,4 @@ podAnnotations:
   dapr.io/sidecar-memory-limit: "128Mi"
   dapr.io/sidecar-cpu-request: "100m"
   dapr.io/sidecar-memory-request: "128Mi"
+  dapr.io/config: "tracing"

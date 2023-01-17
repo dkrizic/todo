@@ -2,18 +2,32 @@ package sender
 
 import (
 	"context"
-	"github.com/dapr/go-sdk/client"
+	dapr "github.com/dapr/go-sdk/client"
 	log "github.com/sirupsen/logrus"
+	"time"
 )
 
 type Sender struct {
-	client     client.Client
+	client     dapr.Client
 	PubSubName string
 	TopicName  string
 }
 
 func NewSender(pubSubName string, topicName string) (notification *Sender, err error) {
-	daprClient, err := client.NewClient()
+	var daprClient dapr.Client
+	// try 10 times to connect to dapr and wait 1 seconds after each try
+	max := 10
+	for i := 0; i < max; i++ {
+		daprClient, err = dapr.NewClient()
+		if err == nil {
+			break
+		}
+		log.WithFields(log.Fields{
+			"try": i,
+			"max": max,
+		}).WithError(err).Warn("Unable to connect to dapr")
+		time.Sleep(1 * time.Second)
+	}
 	if err != nil {
 		return nil, err
 	}
