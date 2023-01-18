@@ -1,13 +1,18 @@
 package cmd
 
 import (
+	"context"
 	"github.com/dkrizic/todo/server/sender"
-	opentracing "github.com/opentracing/opentracing-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	jaegercfg "github.com/uber/jaeger-client-go/config"
-	"io"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/sdk/resource"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
+	"time"
 )
 
 const (
@@ -19,12 +24,12 @@ const (
 	notificationsPubSubNameFlag  = "sender-pubsub-name"
 	notificationsPubSubTopicFlag = "sender-pubsub-topic"
 	tracingEnabledFlag           = "tracing-enabled"
-	tracingUrlFlag               = "tracing-url"
+	tracingAgentHostFlag         = "tracing-agent-host"
+	tracingAgentPortFlag         = "tracing-agent-port"
 )
 
 var senderClient *sender.Sender
-var tracer opentracing.Tracer
-var closer io.Closer
+var tp *tracesdk.TracerProvider
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
@@ -33,40 +38,46 @@ var serveCmd = &cobra.Command{
 	Long: `There are multiple backends available for the service like
 memory, redis, etc. This command will start the service with the
 given backend.`,
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		tracingEnabled := viper.GetBool(tracingEnabledFlag)
-		tracingUrl := viper.GetString(tracingUrlFlag)
+		tracingAgentHost := viper.GetString(tracingAgentHostFlag)
+		tracingAgentPort := viper.GetString(tracingAgentPortFlag)
 		log.WithFields(log.Fields{
-			"tracingEnabled": tracingEnabled,
-			"tracingUrl":     tracingUrl,
+			"tracingEnabled":   tracingEnabled,
+			"tracingAgentHost": tracingAgentHost,
+			"tracingAgentPort": tracingAgentPort,
 		}).Info("Tracing configuration")
 		if tracingEnabled {
-			cfg := jaegercfg.Configuration{
-				ServiceName: "todo",
-				Sampler: &jaegercfg.SamplerConfig{
-					Type:  "const",
-					Param: 1,
-				},
-				Reporter: &jaegercfg.ReporterConfig{
-					LogSpans:           true,
-					LocalAgentHostPort: tracingUrl,
-				},
-			}
-
-			var err error
-			tracer, closer, err = cfg.NewTracer()
+			exp, err := jaeger.New(jaeger.WithAgentEndpoint(jaeger.WithAgentHost(tracingAgentHost), jaeger.WithAgentPort(tracingAgentPort)))
 			if err != nil {
-				log.Fatalf("Could not initialize jaeger tracer: %s", err.Error())
+				log.WithError(err).Fatal("Failed to create Jaeger exporter")
+				return err
 			}
-			opentracing.SetGlobalTracer(tracer)
-			log.WithField("url", tracingUrl).WithField("implementation", "jaeger").Info("Tracing enabled")
+			tp = tracesdk.NewTracerProvider(
+				// Always be sure to batch in production.
+				tracesdk.WithBatcher(exp),
+				// Record information about this application in a Resource.
+				tracesdk.WithResource(resource.NewWithAttributes(
+					semconv.SchemaURL,
+					semconv.ServiceNameKey.String("todo"),
+					attribute.String("environment", "test"),
+				)),
+			)
+			otel.SetTracerProvider(tp)
+			log.WithFields(log.Fields{
+				"tracingAgentHost": tracingAgentHost,
+				"tracingAgentPort": tracingAgentPort,
+			}).Info("Tracing established")
 		} else {
-			log.Info("Tracing disabled")
+			log.Info("Tracing is disabled")
 		}
+		return nil
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
-		if closer != nil {
-			closer.Close()
+		ctx, cancel := context.WithTimeout(cmd.Context(), time.Second*5)
+		defer cancel()
+		if err := tp.Shutdown(ctx); err != nil {
+			log.WithError(err).Fatal("Failed to shutdown tracer provider")
 		}
 	},
 	ValidArgs: []string{"memory", "redis"},
@@ -83,7 +94,8 @@ func init() {
 	serveCmd.PersistentFlags().StringP(notificationsPubSubNameFlag, "", "todo-pubsub", "The name of the pubsub component to use for notifications")
 	serveCmd.PersistentFlags().StringP(notificationsPubSubTopicFlag, "", "todo", "The name of the topic to use for notifications")
 	serveCmd.PersistentFlags().BoolP(tracingEnabledFlag, "t", false, "Enable tracing")
-	serveCmd.PersistentFlags().StringP(tracingUrlFlag, "", "http://localhost:14268/api/traces", "The url of the tracing server")
+	serveCmd.PersistentFlags().StringP(tracingAgentHostFlag, "", "localhost", "The host of the tracing agent")
+	serveCmd.PersistentFlags().StringP(tracingAgentPortFlag, "", "6831", "The port of the tracing agent")
 	viper.BindEnv(httpPortFlag, "TODO_HTTP_PORT")
 	viper.BindEnv(grpcPortFlag, "TODO_GRPC_PORT")
 	viper.BindEnv(healthPortFlag, "TODO_HEALTH_PORT")
@@ -92,5 +104,6 @@ func init() {
 	viper.BindEnv(notificationsPubSubNameFlag, "TODO_NOTIFICATIONS_PUBSUB_NAME")
 	viper.BindEnv(notificationsPubSubTopicFlag, "TODO_NOTIFICATIONS_PUBSUB_TOPIC")
 	viper.BindEnv(tracingEnabledFlag, "TODO_TRACING_ENABLED")
-	viper.BindEnv(tracingUrlFlag, "TODO_TRACING_URL")
+	viper.BindEnv(tracingAgentHostFlag, "TODO_TRACING_AGENT_HOST")
+	viper.BindEnv(tracingAgentPortFlag, "TODO_TRACING_AGENT_PORT")
 }
