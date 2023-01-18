@@ -6,6 +6,7 @@ import (
 	redis "github.com/go-redis/redis/v9"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"strconv"
 )
 
@@ -114,6 +115,7 @@ func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *tod
 			var description string
 			{
 				ctx2, span := otel.Tracer("redis").Start(ctx, "GetAll/ReadTitle")
+				span.SetAttributes(attribute.String("id", key))
 				title = s.RedisAdapter.redis.HGet(ctx2, key, title).Val()
 				span.End()
 			}

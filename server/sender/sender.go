@@ -4,6 +4,7 @@ import (
 	"context"
 	dapr "github.com/dapr/go-sdk/client"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel"
 	"time"
 )
 
@@ -39,6 +40,9 @@ func NewSender(pubSubName string, topicName string) (notification *Sender, err e
 }
 
 func (n *Sender) SendNotification(ctx context.Context, message []byte) error {
+	ctx, span := otel.Tracer("sender").Start(ctx, "SendNotification")
+	defer span.End()
+
 	llog := log.WithFields(log.Fields{
 		"pubsubName": n.PubSubName,
 		"topicName":  n.TopicName,

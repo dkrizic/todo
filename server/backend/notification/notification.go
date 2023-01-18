@@ -35,6 +35,8 @@ func NewServer(config *NotificationConfig) *server {
 }
 
 func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
+	ctx, span := otel.Tracer("notification").Start(ctx, "Create")
+	defer span.End()
 	before, err3 := s.original.Get(ctx, &todo.GetRequest{Id: req.Todo.Id})
 	if err3 != nil {
 		log.WithError(err3).Error("Failed to get todo before deleting")
@@ -58,6 +60,8 @@ func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 }
 
 func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
+	ctx, span := otel.Tracer("notification").Start(ctx, "Update")
+	defer span.End()
 	before, err3 := s.original.Get(ctx, &todo.GetRequest{Id: req.Todo.Id})
 	if err3 != nil {
 		log.WithError(err3).Error("Failed to get todo before deleting")
@@ -87,10 +91,14 @@ func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *tod
 	return s.original.GetAll(ctx, req)
 }
 func (s *server) Get(ctx context.Context, req *todo.GetRequest) (resp *todo.GetResponse, err error) {
+	ctx, span := otel.Tracer("notification").Start(ctx, "Get")
+	defer span.End()
 	return s.original.Get(ctx, req)
 }
 
 func (s *server) Delete(ctx context.Context, req *todo.DeleteRequest) (resp *todo.DeleteResponse, err error) {
+	ctx, span := otel.Tracer("notification").Start(ctx, "Delete")
+	defer span.End()
 	before, err3 := s.original.Get(ctx, &todo.GetRequest{Id: req.Id})
 	if err3 != nil {
 		log.WithError(err3).Error("Failed to get todo before deleting")
