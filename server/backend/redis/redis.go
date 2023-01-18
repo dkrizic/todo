@@ -108,10 +108,22 @@ func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *tod
 		}
 		for _, key := range keys {
 			log.WithField("key", key).Info("Found key")
+			var title string
+			var description string
+			{
+				ctx, span := otel.Tracer("redis").Start(ctx, "GetAll/ReadTitle")
+				defer span.End()
+				title = s.RedisAdapter.redis.HGet(ctx, key, title).Val()
+			}
+			{
+				ctx, span := otel.Tracer("redis").Start(ctx, "GetAll/ReadDescription")
+				defer span.End()
+				description = s.RedisAdapter.redis.HGet(ctx, key, description).Val()
+			}
 			todos = append(todos, &todo.ToDo{
 				Id:          key,
-				Title:       s.RedisAdapter.redis.HGet(ctx, key, title).Val(),
-				Description: s.RedisAdapter.redis.HGet(ctx, key, description).Val(),
+				Title:       title,
+				Description: description,
 			})
 		}
 		if cursor == 0 {

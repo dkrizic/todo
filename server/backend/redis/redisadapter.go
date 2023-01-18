@@ -3,6 +3,7 @@ package redis
 import (
 	"github.com/dkrizic/todo/api/todo"
 	redis "github.com/go-redis/redis/v9"
+	"go.opentelemetry.io/otel"
 	"golang.org/x/net/context"
 )
 
@@ -17,6 +18,8 @@ func NewRedisAdapter(redis *redis.Client) *RedisAdapter {
 }
 
 func (ra *RedisAdapter) ReadFromRedis(ctx context.Context, key string) (*todo.ToDo, error) {
+	ctx, span := otel.Tracer("redis").Start(ctx, "ReadFromRedis")
+	defer span.End()
 	res, err := ra.redis.Exists(ctx, key).Result()
 	if err != nil {
 		return nil, err
@@ -33,6 +36,8 @@ func (ra *RedisAdapter) ReadFromRedis(ctx context.Context, key string) (*todo.To
 }
 
 func (ra *RedisAdapter) WriteToRedis(ctx context.Context, todo *todo.ToDo) (before *todo.ToDo, current *todo.ToDo, err error) {
+	ctx, span := otel.Tracer("redis").Start(ctx, "WriteToRedis")
+	defer span.End()
 	before, err = ra.ReadFromRedis(ctx, todo.Id)
 	if err != nil {
 		return nil, nil, err
@@ -47,6 +52,8 @@ func (ra *RedisAdapter) WriteToRedis(ctx context.Context, todo *todo.ToDo) (befo
 }
 
 func (ra *RedisAdapter) DeleteFromRedis(ctx context.Context, key string) (before *todo.ToDo, err error) {
+	ctx, span := otel.Tracer("redis").Start(ctx, "DeleteFromRedis")
+	defer span.End()
 	before, err = ra.ReadFromRedis(ctx, key)
 	if err != nil {
 		return nil, err
