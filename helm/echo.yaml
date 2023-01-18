@@ -7,6 +7,14 @@ resources:
   requests:
       cpu: 100m
       memory: 128Mi
+ingress:
+  enabled: true
+  className: "nginx"
+  hosts:
+    - host: echo.home.krizic.net
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
 nodeSelector:
   kubernetes.io/arch: arm64
 deploymentAnnotations:

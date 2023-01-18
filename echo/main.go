@@ -31,6 +31,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/health", HealthHandler).Methods("GET", "OPTIONS")
+	r.Handle("7test", otelhttp.NewHandler(http.HandlerFunc(TestHandler), "test"))
 	r.Handle("/notification", otelhttp.NewHandler(http.HandlerFunc(NotificationHandler), "notification"))
 	r.Use(muxlogrus.NewLogger().Middleware)
 	http.Handle("/", r)
@@ -80,6 +81,19 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("ok"))
 }
 
+func TestHandler(w http.ResponseWriter, r *http.Request) {
+	_, span := otel.Tracer("echo").Start(r.Context(), "TestHandler")
+	defer span.End()
+	// log all http headers
+	for name, values := range r.Header {
+		// Loop over all values for the name.
+		for _, value := range values {
+			log.WithField("header", name).Info(value)
+		}
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok"))
+}
 func NotificationHandler(w http.ResponseWriter, r *http.Request) {
 	_, span := otel.Tracer("echo").Start(r.Context(), "NotificationHandler")
 	defer span.End()
