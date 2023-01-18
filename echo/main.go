@@ -41,7 +41,7 @@ func main() {
 		// Record information about this application in a Resource.
 		tracesdk.WithResource(resource.NewWithAttributes(
 			semconv.SchemaURL,
-			semconv.ServiceNameKey.String("todo"),
+			semconv.ServiceNameKey.String("echo"),
 			attribute.String("environment", "test"),
 		)),
 	)
@@ -78,7 +78,7 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
 func NotificationHandler(w http.ResponseWriter, r *http.Request) {
 	_, span := otel.Tracer("main").Start(r.Context(), "NotificationHandler")
 	defer span.End()
-	
+
 	event, err := cloudevents.NewEventFromHTTPRequest(r)
 	if err != nil {
 		log.Print("failed to parse CloudEvent from request: %v", err)
