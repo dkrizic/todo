@@ -122,6 +122,8 @@ func (s *server) Delete(ctx context.Context, req *todo.DeleteRequest) (resp *tod
 }
 
 func (s *server) send(ctx context.Context, change todo.Change) (err error) {
+	ctx, span := otel.Tracer("notification").Start(ctx, "send")
+	defer span.End()
 	data, err := convert(change)
 	if err != nil {
 		return err

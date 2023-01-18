@@ -61,6 +61,8 @@ func NewServer(config *Config) *server {
 }
 
 func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
+	ctx, span := otel.Tracer("redis").Start(ctx, "Create")
+	defer span.End()
 	llog := log.WithFields(log.Fields{
 		"id":          req.Todo.Id,
 		"title":       req.Todo.Title,
@@ -79,6 +81,8 @@ func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 }
 
 func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
+	ctx, span := otel.Tracer("redis").Start(ctx, "Create")
+	defer span.End()
 	llog := log.WithFields(log.Fields{
 		"id":          req.Todo.Id,
 		"title":       req.Todo.Title,
@@ -121,7 +125,7 @@ func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *tod
 			}
 			{
 				ctx2, span := otel.Tracer("redis").Start(ctx, "GetAll/ReadDescription")
-				span.End()
+				span.SetAttributes(attribute.String("id", key))
 				description = s.RedisAdapter.redis.HGet(ctx2, key, description).Val()
 				span.End()
 			}
@@ -143,6 +147,8 @@ func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *tod
 }
 
 func (s *server) Get(ctx context.Context, req *todo.GetRequest) (resp *todo.GetResponse, err error) {
+	ctx, span := otel.Tracer("redis").Start(ctx, "Get")
+	defer span.End()
 	llog := log.WithField("id", req.Id)
 	llog.WithField("id", req.Id).Info("Getting todo")
 	data, err := s.RedisAdapter.ReadFromRedis(ctx, req.Id)
@@ -157,6 +163,8 @@ func (s *server) Get(ctx context.Context, req *todo.GetRequest) (resp *todo.GetR
 }
 
 func (s *server) Delete(ctx context.Context, req *todo.DeleteRequest) (resp *todo.DeleteResponse, err error) {
+	ctx, span := otel.Tracer("redis").Start(ctx, "Get")
+	defer span.End()
 	log.WithField("id", req.Id).Info("Deleting todo")
 	s.RedisAdapter.redis.Del(ctx, req.Id)
 	return &todo.DeleteResponse{
