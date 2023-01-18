@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	muxlogrus "github.com/pytimer/mux-logrus"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
@@ -27,7 +28,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/health", HealthHandler).Methods("GET", "OPTIONS")
-	r.HandleFunc("/notification", NotificationHandler).Methods("POST", "OPTIONS")
+	r.Handle("/notification", otelhttp.NewHandler(http.HandlerFunc(NotificationHandler), "notification"))
 	http.Handle("/", r)
 	r.Use(muxlogrus.NewLogger().Middleware)
 
@@ -76,9 +77,6 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func NotificationHandler(w http.ResponseWriter, r *http.Request) {
-	_, span := otel.Tracer("main").Start(r.Context(), "NotificationHandler")
-	defer span.End()
-
 	event, err := cloudevents.NewEventFromHTTPRequest(r)
 	if err != nil {
 		log.Print("failed to parse CloudEvent from request: %v", err)
