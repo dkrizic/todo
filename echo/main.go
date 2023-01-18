@@ -31,7 +31,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/health", HealthHandler).Methods("GET", "OPTIONS")
-	r.Handle("7test", otelhttp.NewHandler(http.HandlerFunc(TestHandler), "test"))
+	r.Handle("/test", otelhttp.NewHandler(http.HandlerFunc(TestHandler), "test"))
 	r.Handle("/notification", otelhttp.NewHandler(http.HandlerFunc(NotificationHandler), "notification"))
 	r.Use(muxlogrus.NewLogger().Middleware)
 	http.Handle("/", r)
