@@ -112,13 +112,14 @@ func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *tod
 			var description string
 			{
 				ctx, span := otel.Tracer("redis").Start(ctx, "GetAll/ReadTitle")
-				defer span.End()
 				title = s.RedisAdapter.redis.HGet(ctx, key, title).Val()
+				span.End()
 			}
 			{
 				ctx, span := otel.Tracer("redis").Start(ctx, "GetAll/ReadDescription")
-				defer span.End()
+				span.End()
 				description = s.RedisAdapter.redis.HGet(ctx, key, description).Val()
+				span.End()
 			}
 			todos = append(todos, &todo.ToDo{
 				Id:          key,
