@@ -29,7 +29,7 @@ const (
 )
 
 var senderClient *sender.Sender
-var tp *tracesdk.TracerProvider
+var traceProvider *tracesdk.TracerProvider
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
@@ -53,7 +53,7 @@ given backend.`,
 				log.WithError(err).Fatal("Failed to create Jaeger exporter")
 				return err
 			}
-			tp = tracesdk.NewTracerProvider(
+			traceProvider = tracesdk.NewTracerProvider(
 				// Always be sure to batch in production.
 				tracesdk.WithBatcher(exp),
 				// Record information about this application in a Resource.
@@ -63,7 +63,7 @@ given backend.`,
 					attribute.String("environment", "test"),
 				)),
 			)
-			otel.SetTracerProvider(tp)
+			otel.SetTracerProvider(traceProvider)
 			log.WithFields(log.Fields{
 				"tracingAgentHost": tracingAgentHost,
 				"tracingAgentPort": tracingAgentPort,
@@ -76,7 +76,7 @@ given backend.`,
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		ctx, cancel := context.WithTimeout(cmd.Context(), time.Second*5)
 		defer cancel()
-		if err := tp.Shutdown(ctx); err != nil {
+		if err := traceProvider.Shutdown(ctx); err != nil {
 			log.WithError(err).Fatal("Failed to shutdown tracer provider")
 		}
 	},
