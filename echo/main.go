@@ -54,6 +54,7 @@ func main() {
 		// Do not make the application hang when it is shutdown.
 		ctx, cancel = context.WithTimeout(ctx, time.Second*5)
 		defer cancel()
+		log.Info("Shutting down tracer")
 		if err := traceProvider.Shutdown(ctx); err != nil {
 			log.Fatal(err)
 		}
