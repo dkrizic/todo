@@ -1,0 +1,3 @@
+#!/bin/bash
+kubectl -n todo rollout restart deployment todo
+kubectl -n todo rollout restart deployment echo

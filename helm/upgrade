@@ -4,5 +4,5 @@ helm -n todo upgrade --install -f todo.yaml todo ./charts/todo
 helm -n todo upgrade --install -f echo.yaml echo ./charts/echo
 kubectl -n todo apply -f component/component-servicebus.yaml
 kubectl -n todo apply -f component/subscriber-servicebus.yaml
-kubectl -n todo apply -f component/pushover-binding.yaml
+#kubectl -n todo apply -f component/pushover-binding.yaml
 kubectl -n todo apply -f config/tracing.yaml
