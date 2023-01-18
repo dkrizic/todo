@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/dkrizic/todo/api/todo"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel"
 	"golang.org/x/exp/maps"
 )
 
@@ -44,11 +45,16 @@ func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 }
 
 func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *todo.GetAllResponse, err error) {
+	ctx, span := otel.Tracer("memory").Start(ctx, "GetAll")
+	defer span.End()
 	log.WithField("count", len(todoMap)).Info("Getting all todos")
 	// convert map of todoMap to slice
+	_, span2 := otel.Tracer("memory").Start(ctx, "GetAll/mapValues")
+	todos := maps.Values(todoMap)
+	defer span2.End()
 	return &todo.GetAllResponse{
 		Api:   "v1",
-		Todos: maps.Values(todoMap),
+		Todos: todos,
 	}, nil
 }
 

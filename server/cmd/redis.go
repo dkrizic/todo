@@ -74,6 +74,7 @@ var redisCmd = &cobra.Command{
 			HealthPort:     healthPort,
 			MetricsPort:    metricsPort,
 			Implementation: notification,
+			TraceProvider:  traceProvider,
 		}.Start()
 	},
 }

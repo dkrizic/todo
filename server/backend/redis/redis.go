@@ -5,6 +5,7 @@ import (
 	"github.com/dkrizic/todo/api/todo"
 	redis "github.com/go-redis/redis/v9"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel"
 	"strconv"
 )
 
@@ -91,6 +92,8 @@ func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 }
 
 func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *todo.GetAllResponse, err error) {
+	ctx, span := otel.Tracer("redis").Start(ctx, "GetAll")
+	defer span.End()
 	log.Info("Getting all todos")
 
 	var cursor uint64 = 0

@@ -8,6 +8,7 @@ import (
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -22,6 +23,7 @@ type Backend struct {
 	HealthPort     int
 	MetricsPort    int
 	Implementation todo.ToDoServiceServer
+	TraceProvider  *tracesdk.TracerProvider
 }
 
 func (backend Backend) Start() (err error) {
