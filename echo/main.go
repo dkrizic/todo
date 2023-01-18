@@ -26,11 +26,14 @@ const (
 func main() {
 	log.Info("Starting app")
 
+	handler := http.Handler(http.DefaultServeMux)
+	handler = otelhttp.NewHandler(handler, "echo")
+
 	r := mux.NewRouter()
 	r.HandleFunc("/health", HealthHandler).Methods("GET", "OPTIONS")
 	r.Handle("/notification", otelhttp.NewHandler(http.HandlerFunc(NotificationHandler), "notification"))
-	http.Handle("/", r)
 	r.Use(muxlogrus.NewLogger().Middleware)
+	http.Handle("/", r)
 
 	exp, err := jaeger.New(jaeger.WithAgentEndpoint(jaeger.WithAgentHost("localhost"), jaeger.WithAgentPort("6831")))
 	if err != nil {
