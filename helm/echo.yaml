@@ -10,7 +10,7 @@ resources:
 nodeSelector:
   kubernetes.io/arch: arm64
 deploymentAnnotations:
-  sidecar.jaegertracing.io/inject: true
+  sidecar.jaegertracing.io/inject: jaeger
 podAnnotations:
   dapr.io/app-id: echo
   dapr.io/app-port: "8000"
