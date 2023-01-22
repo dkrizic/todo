@@ -91,6 +91,7 @@ func TestHandler(w http.ResponseWriter, r *http.Request) {
 func NotificationHandler(w http.ResponseWriter, r *http.Request) {
 	_, span := otel.Tracer("echo").Start(r.Context(), "NotificationHandler")
 	defer span.End()
+	dumpHeaders(r)
 	event, err := cloudevents.NewEventFromHTTPRequest(r)
 	if err != nil {
 		log.Print("failed to parse CloudEvent from request: %v", err)
