@@ -84,13 +84,7 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
 func TestHandler(w http.ResponseWriter, r *http.Request) {
 	_, span := otel.Tracer("echo").Start(r.Context(), "TestHandler")
 	defer span.End()
-	// log all http headers
-	for name, values := range r.Header {
-		// Loop over all values for the name.
-		for _, value := range values {
-			log.WithField("header", name).Info(value)
-		}
-	}
+	dumpHeaders(r)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
 }
@@ -133,4 +127,14 @@ func NotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
+}
+
+// methods that dumps all header values from a given request to log
+func dumpHeaders(r *http.Request) {
+	for name, values := range r.Header {
+		// Loop over all values for the name.
+		for _, value := range values {
+			log.WithField("header", name).Info(value)
+		}
+	}
 }

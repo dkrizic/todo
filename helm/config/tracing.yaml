@@ -9,8 +9,8 @@ spec:
     samplingRate: "1"
     zipkin:
       endpointAddress: http://jaeger-collector.observability:9411/api/v2/spans
-    #otel:
-    #  endpointAddress: "localhost:4317"
-    #  isSecure: false
+    otel:
+      endpointAddress: "
+      isSecure: false
 
 
