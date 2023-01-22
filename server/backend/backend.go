@@ -8,6 +8,7 @@ import (
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -72,7 +73,7 @@ func (backend Backend) Start() (err error) {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/", gwmux)
+	mux.Handle("/", otelhttp.NewHandler(gwmux, "grpc-gateway"))
 	mux.HandleFunc("/swagger-ui/swagger.json", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "swagger.json")
 	})
