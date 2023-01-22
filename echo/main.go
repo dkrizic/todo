@@ -83,6 +83,7 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
 
 func TestHandler(w http.ResponseWriter, r *http.Request) {
 	_, span := otel.Tracer("echo").Start(r.Context(), "TestHandler")
+	log.WithField("traceparent", span.SpanContext().TraceID()).Info("TestHandler")
 	defer span.End()
 	dumpHeaders(r)
 	w.WriteHeader(http.StatusOK)
