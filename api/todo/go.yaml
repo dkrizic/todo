@@ -1,0 +1,7 @@
+additionalProperties:
+  outputAsLibrary: false
+  onlyInterfaces: false
+  packageName: todo
+  packageVersion: 1.0.0
+  router: chi
+  sourceFolder: .

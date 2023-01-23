@@ -1,0 +1,147 @@
+openapi: 3.0.0
+info:
+    title: Todo API
+    version: 1.0.0
+    description: A simple Todo API
+    contact:
+        name: API Support
+        url: https://todo.krizic.net
+        email: darko@krizic.net
+    license:
+        name: Apache 2.0
+        url: http://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: https://todo.krizic.net
+    description: Production server
+components:
+  schemas:
+    Todo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the todo
+        name:
+          type: string
+          description: Name of the todo
+        description:
+          type: string
+          description: Description of the todo
+        status:
+          $ref: '#/components/schemas/TodoStatus'
+      required:
+        - id
+        - name
+        - description
+        - status
+    TodoStatus:
+      type: string
+      description: Status of the todo
+      enum:
+      - ACTIVE
+      - COMPLETED
+      - DELETED
+paths:
+  /api/v1/todos:
+    get:
+      operationId: get_all_todos
+      summary: Get all todos
+      description: Get all todos
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+        500:
+          description: Internal Server Error
+    post:
+        operationId: create_todo
+        summary: Create a todo
+        description: Create a todo
+        requestBody:
+          description: Todo object that needs to be added
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        responses:
+          201:
+            description: Created
+            content:
+              application/json:
+                schema:
+                    $ref: '#/components/schemas/Todo'
+          500:
+            description: Internal Server Error
+  /api/v1/todos/{todoId}:
+    get:
+     operationId: get_todo
+     summary: Get a todo
+     description: Get a todo
+     parameters:
+      - name: todoId
+        in: path
+        description: ID of todo to return
+        required: true
+        schema:
+          type: string
+     responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Todo'
+      404:
+        description: Not Found
+      500:
+        description: Internal Server Error
+    put:
+      operationId: update_todo
+      summary: Update a todo
+      description: Update a todo
+      parameters:
+        - name: todoId
+          in: path
+          description: ID of todo to update
+          required: true
+          schema:
+            type: string
+            format: int64
+      requestBody:
+        description: Todo object that needs to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Todo'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        500:
+          description: Internal Server Error
+    delete:
+      operationId: delete_todo
+      summary: Delete a todo
+      description: Delete a todo
+      parameters:
+      - name: todoId
+        in: path
+        description: ID of todo to delete
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: OK
+        500:
+          description: Internal Server Error

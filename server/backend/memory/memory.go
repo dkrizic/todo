@@ -26,6 +26,8 @@ func NewServer(maxEntries int) *server {
 }
 
 func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
+	ctx, span := otel.Tracer("memory").Start(ctx, "Create")
+	defer span.End()
 	log.WithField("id", req.Todo.Id).WithField("title", req.Todo.Title).Info("Creating new todo")
 	// add to map
 	todoMap[req.Todo.Id] = req.Todo
@@ -36,6 +38,8 @@ func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 }
 
 func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
+	ctx, span := otel.Tracer("memory").Start(ctx, "Update")
+	defer span.End()
 	log.WithField("id", req.Todo.Id).WithField("title", req.Todo.Title).Info("Updating todo")
 	todoMap[req.Todo.Id] = req.Todo
 	return &todo.CreateOrUpdateResponse{
@@ -59,6 +63,8 @@ func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *tod
 }
 
 func (s *server) Get(ctx context.Context, req *todo.GetRequest) (resp *todo.GetResponse, err error) {
+	ctx, span := otel.Tracer("memory").Start(ctx, "Get")
+	defer span.End()
 	log.WithField("id", req.Id).Info("Getting todo")
 	return &todo.GetResponse{
 		Api:  "v1",
@@ -67,6 +73,8 @@ func (s *server) Get(ctx context.Context, req *todo.GetRequest) (resp *todo.GetR
 }
 
 func (s *server) Delete(ctx context.Context, req *todo.DeleteRequest) (resp *todo.DeleteResponse, err error) {
+	ctx, span := otel.Tracer("memory").Start(ctx, "Delete")
+	defer span.End()
 	log.WithField("id", req.Id).Info("Deleting todo")
 	delete(todoMap, req.Id)
 	return &todo.DeleteResponse{
