@@ -19,6 +19,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"net/http"
+	"os"
+	"os/signal"
 	"time"
 )
 
@@ -29,7 +31,24 @@ const (
 func main() {
 	log.Info("Starting app")
 
-	initProvider()
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+
+	_, err := initProvider()
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(2)
+	}
+
+	shutdown, err := initProvider()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		if err := shutdown(ctx); err != nil {
+			log.Fatal("failed to shutdown TracerProvider: %w", err)
+		}
+	}()
 
 	handler := http.Handler(http.DefaultServeMux)
 	handler = otelhttp.NewHandler(handler, "echo")

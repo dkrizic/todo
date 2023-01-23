@@ -17,8 +17,8 @@ ingress:
           pathType: ImplementationSpecific
 nodeSelector:
   kubernetes.io/arch: arm64
-deploymentAnnotations:
-  sidecar.jaegertracing.io/inject: jaeger
+deploymentAnnotations: {}
+  #sidecar.jaegertracing.io/inject: jaeger
 podAnnotations:
   dapr.io/app-id: echo
   dapr.io/app-port: "8000"
