@@ -104,7 +104,7 @@ func initProvider() (func(context.Context) error, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
 	}
-	log.WithField("oltpEndpoint", oltpEndpoint).Info("Connected to OpenTelemetry Collector"
+	log.WithField("oltpEndpoint", oltpEndpoint).Info("Connected to OpenTelemetry Collector")
 
 	// Set up a trace exporter
 	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
