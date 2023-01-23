@@ -27,6 +27,7 @@ import (
 const (
 	listenAddress = "0.0.0.0:8000"
 	oltpEndpoint  = "otel-collector.observability:4317"
+	appName       = "echo"
 )
 
 func main() {
@@ -76,7 +77,7 @@ func initProvider() (func(context.Context) error, error) {
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
 			// the service name used to display traces in backends
-			semconv.ServiceNameKey.String("test-service"),
+			semconv.ServiceNameKey.String(appName),
 		),
 	)
 	if err != nil {
@@ -84,11 +85,6 @@ func initProvider() (func(context.Context) error, error) {
 	}
 
 	log.WithField("oltpEndpoint", oltpEndpoint).Info("Connecting to OpenTelemetry Collector")
-	// If the OpenTelemetry Collector is running on a local cluster (minikube or
-	// microk8s), it should be accessible through the NodePort service at the
-	// `localhost:30080` endpoint. Otherwise, replace `localhost` with the
-	// endpoint of your cluster. If you run the app inside k8s, then you can
-	// probably connect directly to the service through dns.
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 	conn, err := grpc.DialContext(ctx, oltpEndpoint,
