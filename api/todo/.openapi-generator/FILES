@@ -1,0 +1,16 @@
+.openapi-generator-ignore
+Dockerfile
+README.md
+api.go
+api/openapi.yaml
+api_default.go
+api_default_service.go
+error.go
+go.mod
+helpers.go
+impl.go
+logger.go
+main.go
+model_todo.go
+model_todo_status.go
+routers.go
