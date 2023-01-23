@@ -26,6 +26,7 @@ import (
 
 const (
 	listenAddress = "0.0.0.0:8000"
+	oltpEndpoint  = "otel-collector.observability:4317"
 )
 
 func main() {
@@ -87,6 +88,7 @@ func initProvider() (func(context.Context) error, error) {
 		return nil, fmt.Errorf("failed to create resource: %w", err)
 	}
 
+	log.WithField("oltpEndpoint", oltpEndpoint).Info("Connecting to OpenTelemetry Collector")
 	// If the OpenTelemetry Collector is running on a local cluster (minikube or
 	// microk8s), it should be accessible through the NodePort service at the
 	// `localhost:30080` endpoint. Otherwise, replace `localhost` with the
@@ -94,7 +96,7 @@ func initProvider() (func(context.Context) error, error) {
 	// probably connect directly to the service through dns.
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
-	conn, err := grpc.DialContext(ctx, "otel-collector.observability:4317",
+	conn, err := grpc.DialContext(ctx, oltpEndpoint,
 		// Note the use of insecure transport here. TLS is recommended in production.
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(),
@@ -102,6 +104,7 @@ func initProvider() (func(context.Context) error, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
 	}
+	log.WithField("oltpEndpoint", oltpEndpoint).Info("Connected to OpenTelemetry Collector"
 
 	// Set up a trace exporter
 	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
