@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	todo "github.com/dkrizic/todo/api/todo"
 	"github.com/gorilla/mux"
@@ -10,12 +11,13 @@ import (
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"net/http"
 	"time"
 )
@@ -27,6 +29,8 @@ const (
 func main() {
 	log.Info("Starting app")
 
+	initProvider()
+
 	handler := http.Handler(http.DefaultServeMux)
 	handler = otelhttp.NewHandler(handler, "echo")
 
@@ -36,35 +40,6 @@ func main() {
 	r.Handle("/notification", otelhttp.NewHandler(http.HandlerFunc(NotificationHandler), "notification"))
 	r.Use(muxlogrus.NewLogger().Middleware)
 	http.Handle("/", r)
-
-	exp, err := jaeger.New(jaeger.WithAgentEndpoint(jaeger.WithAgentHost("localhost"), jaeger.WithAgentPort("6831")))
-	if err != nil {
-		log.Fatal(err)
-	}
-	traceProvider := tracesdk.NewTracerProvider(
-		// Always be sure to batch in production.
-		tracesdk.WithBatcher(exp),
-		// Record information about this application in a Resource.
-		tracesdk.WithResource(resource.NewWithAttributes(
-			semconv.SchemaURL,
-			semconv.ServiceNameKey.String("echo"),
-			attribute.String("environment", "test"),
-		)),
-	)
-	otel.SetTracerProvider(traceProvider)
-	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	defer func(ctx context.Context) {
-		// Do not make the application hang when it is shutdown.
-		ctx, cancel = context.WithTimeout(ctx, time.Second*5)
-		defer cancel()
-		log.Info("Shutting down tracer")
-		if err := traceProvider.Shutdown(ctx); err != nil {
-			log.Fatal(err)
-		}
-	}(ctx)
 
 	srv := &http.Server{
 		Handler:      r,
@@ -76,6 +51,60 @@ func main() {
 	log.WithField("listenAddress", listenAddress).Info("Starting listener")
 	log.Fatal(srv.ListenAndServe())
 	log.Info("Stopping listener")
+}
+
+// Initializes an OTLP exporter, and configures the corresponding trace and
+// metric providers.
+func initProvider() (func(context.Context) error, error) {
+	ctx := context.Background()
+
+	res, err := resource.New(ctx,
+		resource.WithAttributes(
+			// the service name used to display traces in backends
+			semconv.ServiceNameKey.String("test-service"),
+		),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create resource: %w", err)
+	}
+
+	// If the OpenTelemetry Collector is running on a local cluster (minikube or
+	// microk8s), it should be accessible through the NodePort service at the
+	// `localhost:30080` endpoint. Otherwise, replace `localhost` with the
+	// endpoint of your cluster. If you run the app inside k8s, then you can
+	// probably connect directly to the service through dns.
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	defer cancel()
+	conn, err := grpc.DialContext(ctx, "otel-collector.observability:4317",
+		// Note the use of insecure transport here. TLS is recommended in production.
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithBlock(),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
+	}
+
+	// Set up a trace exporter
+	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create trace exporter: %w", err)
+	}
+
+	// Register the trace exporter with a TracerProvider, using a batch
+	// span processor to aggregate spans before export.
+	bsp := tracesdk.NewBatchSpanProcessor(traceExporter)
+	tracerProvider := tracesdk.NewTracerProvider(
+		tracesdk.WithSampler(tracesdk.AlwaysSample()),
+		tracesdk.WithResource(res),
+		tracesdk.WithSpanProcessor(bsp),
+	)
+	otel.SetTracerProvider(tracerProvider)
+
+	// set global propagator to tracecontext (the default is no-op).
+	otel.SetTextMapPropagator(propagation.TraceContext{})
+
+	// Shutdown will flush any remaining spans and shut down the exporter.
+	return tracerProvider.Shutdown, nil
 }
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
