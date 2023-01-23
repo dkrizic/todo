@@ -35,12 +35,7 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
-	_, err := initProvider()
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(2)
-	}
-
+	// Initialize the OTLP exporter and the corresponding trace and metric providers.
 	shutdown, err := initProvider()
 	if err != nil {
 		log.Fatal(err)
