@@ -2,10 +2,8 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	todo "github.com/dkrizic/todo/api/todo"
 	"github.com/gorilla/mux"
 	muxlogrus "github.com/pytimer/mux-logrus"
 	log "github.com/sirupsen/logrus"
@@ -153,23 +151,6 @@ func NotificationHandler(w http.ResponseWriter, r *http.Request) {
 		"dataschema":      event.DataSchema(),
 		"data":            string(event.Data()),
 	}).Info("Received event")
-
-	var change todo.Change
-	json.Unmarshal(event.Data(), &change)
-	if change.Before != nil {
-		log.WithFields(log.Fields{
-			"beforeId":          change.Before.Id,
-			"beforeTitle":       change.Before.Title,
-			"beforeDescription": change.Before.Description,
-		}).Info("Before")
-	}
-	if change.After != nil {
-		log.WithFields(log.Fields{
-			"afterId":          change.After.Id,
-			"afterTitle":       change.After.Title,
-			"afterDescription": change.After.Description,
-		}).Info("After")
-	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
