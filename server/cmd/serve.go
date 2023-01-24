@@ -2,17 +2,19 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"github.com/dkrizic/todo/server/sender"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"time"
 )
 
@@ -25,12 +27,12 @@ const (
 	notificationsPubSubNameFlag  = "sender-pubsub-name"
 	notificationsPubSubTopicFlag = "sender-pubsub-topic"
 	tracingEnabledFlag           = "tracing-enabled"
-	tracingAgentHostFlag         = "tracing-agent-host"
-	tracingAgentPortFlag         = "tracing-agent-port"
+	tracingEndpointFlag          = "tracing-endpoint"
 )
 
 var senderClient *sender.Sender
 var traceProvider *tracesdk.TracerProvider
+var shutdown func(context.Context) error
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
@@ -41,46 +43,27 @@ memory, redis, etc. This command will start the service with the
 given backend.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		tracingEnabled := viper.GetBool(tracingEnabledFlag)
-		tracingAgentHost := viper.GetString(tracingAgentHostFlag)
-		tracingAgentPort := viper.GetString(tracingAgentPortFlag)
+		tracingEndpoint := viper.GetString(tracingEndpointFlag)
 		log.WithFields(log.Fields{
-			"tracingEnabled":   tracingEnabled,
-			"tracingAgentHost": tracingAgentHost,
-			"tracingAgentPort": tracingAgentPort,
+			"tracingEnabled":  tracingEnabled,
+			"tracingEndpoint": tracingEndpoint,
 		}).Info("Tracing configuration")
-		if tracingEnabled {
-			exp, err := jaeger.New(jaeger.WithAgentEndpoint(jaeger.WithAgentHost(tracingAgentHost), jaeger.WithAgentPort(tracingAgentPort)))
-			if err != nil {
-				log.WithError(err).Fatal("Failed to create Jaeger exporter")
-				return err
-			}
-			traceProvider = tracesdk.NewTracerProvider(
-				// Always be sure to batch in production.
-				tracesdk.WithBatcher(exp),
-				// Record information about this application in a Resource.
-				tracesdk.WithResource(resource.NewWithAttributes(
-					semconv.SchemaURL,
-					semconv.ServiceNameKey.String("todo"),
-					attribute.String("environment", "test"),
-				)),
-			)
-			otel.SetTracerProvider(traceProvider)
-			otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
-			log.WithFields(log.Fields{
-				"tracingAgentHost": tracingAgentHost,
-				"tracingAgentPort": tracingAgentPort,
-			}).Info("Tracing established")
-		} else {
-			log.Info("Tracing is disabled")
+		var err error
+		shutdown, err = initProvider(tracingEnabled, tracingEndpoint)
+		if err != nil {
+			log.WithError(err).Fatal("Failed to initialize tracing provider")
+			return err
 		}
 		return nil
 	},
-	PersistentPostRun: func(cmd *cobra.Command, args []string) {
+	PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
 		ctx, cancel := context.WithTimeout(cmd.Context(), time.Second*5)
 		defer cancel()
-		if err := traceProvider.Shutdown(ctx); err != nil {
-			log.WithError(err).Fatal("Failed to shutdown tracer provider")
+		if err := shutdown(ctx); err != nil {
+			log.WithError(err).Fatal("Failed to shutdown TracerProvider")
+			return err
 		}
+		return nil
 	},
 	ValidArgs: []string{"memory", "redis"},
 }
@@ -96,8 +79,7 @@ func init() {
 	serveCmd.PersistentFlags().StringP(notificationsPubSubNameFlag, "", "todo-pubsub", "The name of the pubsub component to use for notifications")
 	serveCmd.PersistentFlags().StringP(notificationsPubSubTopicFlag, "", "todo", "The name of the topic to use for notifications")
 	serveCmd.PersistentFlags().BoolP(tracingEnabledFlag, "t", false, "Enable tracing")
-	serveCmd.PersistentFlags().StringP(tracingAgentHostFlag, "", "localhost", "The host of the tracing agent")
-	serveCmd.PersistentFlags().StringP(tracingAgentPortFlag, "", "6831", "The port of the tracing agent")
+	serveCmd.PersistentFlags().StringP(tracingEndpointFlag, "", "localhost:4317", "The endpoint to send traces to")
 	viper.BindEnv(httpPortFlag, "TODO_HTTP_PORT")
 	viper.BindEnv(grpcPortFlag, "TODO_GRPC_PORT")
 	viper.BindEnv(healthPortFlag, "TODO_HEALTH_PORT")
@@ -106,6 +88,54 @@ func init() {
 	viper.BindEnv(notificationsPubSubNameFlag, "TODO_NOTIFICATIONS_PUBSUB_NAME")
 	viper.BindEnv(notificationsPubSubTopicFlag, "TODO_NOTIFICATIONS_PUBSUB_TOPIC")
 	viper.BindEnv(tracingEnabledFlag, "TODO_TRACING_ENABLED")
-	viper.BindEnv(tracingAgentHostFlag, "TODO_TRACING_AGENT_HOST")
-	viper.BindEnv(tracingAgentPortFlag, "TODO_TRACING_AGENT_PORT")
+	viper.BindEnv(tracingEndpointFlag, "TODO_TRACING_ENDPOINT")
+}
+
+func initProvider(tracingEnabled bool, tracingEndpoint string) (func(context.Context) error, error) {
+	ctx := context.Background()
+
+	res, err := resource.New(ctx,
+		resource.WithAttributes(
+			// the service name used to display traces in backends
+			semconv.ServiceNameKey.String("todo"),
+		),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create resource: %w", err)
+	}
+
+	log.WithField("oltpEndpoint", tracingEndpoint).Info("Connecting to OpenTelemetry Collector")
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	defer cancel()
+	conn, err := grpc.DialContext(ctx, tracingEndpoint,
+		// Note the use of insecure transport here. TLS is recommended in production.
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithBlock(),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
+	}
+	log.WithField("oltpEndpoint", tracingEndpoint).Info("Connected to OpenTelemetry Collector")
+
+	// Set up a trace exporter
+	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create trace exporter: %w", err)
+	}
+
+	// Register the trace exporter with a TracerProvider, using a batch
+	// span processor to aggregate spans before export.
+	bsp := tracesdk.NewBatchSpanProcessor(traceExporter)
+	tracerProvider := tracesdk.NewTracerProvider(
+		tracesdk.WithSampler(tracesdk.AlwaysSample()),
+		tracesdk.WithResource(res),
+		tracesdk.WithSpanProcessor(bsp),
+	)
+	otel.SetTracerProvider(tracerProvider)
+
+	// set global propagator to tracecontext (the default is no-op).
+	otel.SetTextMapPropagator(propagation.TraceContext{})
+
+	// Shutdown will flush any remaining spans and shut down the exporter.
+	return tracerProvider.Shutdown, nil
 }

@@ -131,7 +131,5 @@ notifications:
     topic: "todo"
 
 tracing:
-  enabled: true
-  agent:
-    host: "localhost"
-    port: 6831
+  enabled: false
+  endpoint: http://localhost:9411/api/v2/spans

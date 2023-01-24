@@ -70,10 +70,10 @@ notifications:
   enabled: true
 autoscaling:
   enabled: true
-  minReplicas: 2
-  maxReplicas: 5
+  minReplicas: 1
+  maxReplicas: 3
   targetCPUUtilizationPercentage: 50
   targetMemoryUtilizationPercentage: 60
 tracing:
-  agent:
-    host: "otel-collector.observability"
+  enabled: true
+  endpoint: http://otel-collector.observability:9411/api/v2/spans

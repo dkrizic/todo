@@ -18,5 +18,4 @@ data:
   TODO_NOTIFICATIONS_PUBSUB_NAME: "{{ .Values.notifications.pubsub.name }}"
   TODO_NOTIFICATIONS_PUBSUB_TOPIC: "{{ .Values.notifications.pubsub.topic }}"
   TODO_TRACING_ENABLED: "{{ .Values.tracing.enabled | toString }}"
-  TODO_TRACING_AGENT_HOST: "{{ .Values.tracing.agent.host }}"
-  TODO_TRACING_AGENT_PORT: "{{ .Values.tracing.agent.port | toString }}"
+  TODO_TRACING_ENDPOINT: "{{ .Values.tracing.endpoint }}"
