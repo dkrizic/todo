@@ -76,4 +76,4 @@ autoscaling:
   targetMemoryUtilizationPercentage: 60
 tracing:
   enabled: true
-  endpoint: http://otel-collector.observability:9411/api/v2/spans
+  endpoint: otel-collector.observability:4317
