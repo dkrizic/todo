@@ -1,5 +1,5 @@
 additionalProperties:
-  outputAsLibrary: true
+  outputAsLibrary: false
   onlyInterfaces: true
   packageName: todo
   packageVersion: 1.0.0

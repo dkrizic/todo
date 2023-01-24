@@ -6,3 +6,7 @@ openapi-generator generate \
 	-i todo.yaml \
 	-g go-server \
 	-c go.yaml
+(
+  cd todo
+  rm main.go Dockerfile api_default_service.go
+)

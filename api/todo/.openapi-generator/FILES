@@ -1,11 +1,14 @@
+Dockerfile
 README.md
 api.go
 api/openapi.yaml
 api_default.go
 error.go
+go.mod
 helpers.go
 impl.go
 logger.go
+main.go
 model_todo.go
 model_todo_status.go
 routers.go
