@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	"io/ioutil"
@@ -23,6 +24,8 @@ type Backend struct {
 	TraceProvider  *tracesdk.TracerProvider
 }
 
+var backend Backend
+
 func (backend Backend) Start() (err error) {
 
 	log.WithFields(log.Fields{
@@ -36,61 +39,8 @@ func (backend Backend) Start() (err error) {
 	mux.HandleFunc("/swagger-ui/swagger.json", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "swagger.json")
 	})
-	mux.HandleFunc("/api/v1/todos", func(w http.ResponseWriter, r *http.Request) {
-		ctx, span := backend.TraceProvider.Tracer("backend").Start(r.Context(), "todos")
-		defer span.End()
-		switch r.Method {
-		case "GET":
-			response, err := backend.Implementation.GetAll(ctx, &repository.GetAllRequest{})
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(response)
-		case "POST":
-			data, err := extracaDataFromRequest(ctx, r)
-			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
-			todo, err := convertJsonToTodoStruct(ctx, data)
-			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
-			response, err := backend.Implementation.Create(ctx, &repository.CreateOrUpdateRequest{
-				&todo,
-			})
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			w.WriteHeader(http.StatusCreated)
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(response)
-		default:
-			w.WriteHeader(http.StatusMethodNotAllowed)
-		}
-	})
-	mux.HandleFunc("/api/v1/todos/{id}", func(w http.ResponseWriter, r *http.Request) {
-		ctx, span := backend.TraceProvider.Tracer("backend").Start(r.Context(), "todos/{id}")
-		defer span.End()
-		// get id from path
-		id := chi.URLParam(r, "id")
-		switch r.Method {
-		case "GET":
-			backend.Implementation.Get(ctx, &repository.GetRequest{
-				Id: id,
-			})
-		case "PUT":
-			backend.Implementation.Update(ctx, &repository.CreateOrUpdateRequest{})
-		case "DELETE":
-			backend.Implementation.Delete(ctx, &repository.DeleteRequest{})
-		default:
-			w.WriteHeader(http.StatusMethodNotAllowed)
-		}
-	})
+	mux.Handle("/api/v1/todos", otelhttp.NewHandler(http.HandlerFunc(TodosHandler), "todos"))
+	mux.Handle("/api/v1/todos/{id}", otelhttp.NewHandler(http.HandlerFunc(TodoHandler), "todos/{id}"))
 	mux.Handle("/swagger-ui/", http.StripPrefix("/swagger-ui/", http.FileServer(http.Dir("swagger-ui"))))
 
 	gwServer := &http.Server{
@@ -158,4 +108,61 @@ func convertTodoStructToJson(ctx context.Context, todo repository.Todo) (jsonDat
 		return jsonData, err
 	}
 	return jsonData, nil
+}
+
+func TodosHandler(w http.ResponseWriter, r *http.Request) {
+	ctx, span := otel.Tracer("backend").Start(r.Context(), "todos")
+	defer span.End()
+	switch r.Method {
+	case "GET":
+		response, err := backend.Implementation.GetAll(ctx, &repository.GetAllRequest{})
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	case "POST":
+		data, err := extracaDataFromRequest(ctx, r)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		todo, err := convertJsonToTodoStruct(ctx, data)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		response, err := backend.Implementation.Create(ctx, &repository.CreateOrUpdateRequest{
+			&todo,
+		})
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusCreated)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
+
+func TodoHandler(w http.ResponseWriter, r *http.Request) {
+	ctx, span := otel.Tracer("backend").Start(r.Context(), "todos/{id}")
+	defer span.End()
+	// get id from path
+	id := chi.URLParam(r, "id")
+	switch r.Method {
+	case "GET":
+		backend.Implementation.Get(ctx, &repository.GetRequest{
+			Id: id,
+		})
+	case "PUT":
+		backend.Implementation.Update(ctx, &repository.CreateOrUpdateRequest{})
+	case "DELETE":
+		backend.Implementation.Delete(ctx, &repository.DeleteRequest{})
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
 }
