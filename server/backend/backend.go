@@ -126,7 +126,6 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-	}
 	case "POST":
 		data, err := extracaDataFromRequest(ctx, r)
 		if err != nil {
