@@ -38,15 +38,13 @@ func (backend Backend) Start() (err error) {
 	mux.Handle("/api/v1/todos", otelhttp.NewHandler(http.HandlerFunc(TodosHandler), "todos"))
 	mux.Handle("/api/v1/todos/{id}", otelhttp.NewHandler(http.HandlerFunc(TodoHandler), "todos/{id}"))
 	mux.Handle("/swagger-ui/", http.StripPrefix("/swagger-ui/", http.FileServer(http.Dir("swagger-ui"))))
-
-	gwServer := &http.Server{
+	backendServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", backend.HttpPort),
 		Handler: mux,
 	}
-
 	log.WithField("httpPort", backend.HttpPort).Info("Serving HTTP and gRPC gateway")
 	go func() {
-		log.Fatal(gwServer.ListenAndServe())
+		log.Fatal(backendServer.ListenAndServe())
 	}()
 
 	metricsmux := http.NewServeMux()
