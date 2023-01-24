@@ -2,7 +2,7 @@ package redis
 
 import (
 	"context"
-	"github.com/dkrizic/todo/api/todo"
+	repository "github.com/dkrizic/todo/server/backend/repository"
 	redis "github.com/go-redis/redis/v9"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
@@ -16,7 +16,6 @@ const (
 )
 
 type server struct {
-	todo.UnimplementedToDoServiceServer
 	RedisAdapter *RedisAdapter
 }
 
@@ -56,11 +55,11 @@ func NewServer(config *Config) *server {
 		RedisAdapter: redisAdapter,
 	}
 	// ensure server implements the interface
-	var _ todo.ToDoServiceServer = myServer
+	var _ repository.TodoRepository = myServer
 	return myServer
 }
 
-func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
+func (s *server) Create(ctx context.Context, req *repository.CreateOrUpdateRequest) (resp *repository.CreateOrUpdateResponse, err error) {
 	ctx, span := otel.Tracer("redis").Start(ctx, "Create")
 	defer span.End()
 	llog := log.WithFields(log.Fields{
@@ -74,13 +73,12 @@ func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 		llog.WithError(err).Fatal("Failed to create todo")
 		return nil, err
 	}
-	return &todo.CreateOrUpdateResponse{
-		Api:  "v1",
+	return &repository.CreateOrUpdateResponse{
 		Todo: current,
 	}, nil
 }
 
-func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
+func (s *server) Update(ctx context.Context, req *repository.CreateOrUpdateRequest) (resp *repository.CreateOrUpdateResponse, err error) {
 	ctx, span := otel.Tracer("redis").Start(ctx, "Create")
 	defer span.End()
 	llog := log.WithFields(log.Fields{
@@ -90,19 +88,18 @@ func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 	})
 	llog.Info("Updating todo")
 	_, current, err := s.RedisAdapter.WriteToRedis(ctx, req.Todo)
-	return &todo.CreateOrUpdateResponse{
-		Api:  "v1",
+	return &repository.CreateOrUpdateResponse{
 		Todo: current,
 	}, nil
 }
 
-func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *todo.GetAllResponse, err error) {
+func (s *server) GetAll(ctx context.Context, req *repository.GetAllRequest) (resp *repository.GetAllResponse, err error) {
 	ctx, span := otel.Tracer("redis").Start(ctx, "GetAll")
 	defer span.End()
 	log.Info("Getting all todos")
 
 	var cursor uint64 = 0
-	todos := make([]*todo.ToDo, 0)
+	todos := make([]*repository.Todo, 0)
 	for {
 		var keys []string
 		var err error
@@ -129,7 +126,7 @@ func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *tod
 				description = s.RedisAdapter.redis.HGet(ctx2, key, description).Val()
 				span.End()
 			}
-			todos = append(todos, &todo.ToDo{
+			todos = append(todos, &repository.Todo{
 				Id:          key,
 				Title:       title,
 				Description: description,
@@ -140,13 +137,12 @@ func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *tod
 		}
 	}
 
-	return &todo.GetAllResponse{
-		Api:   "v1",
+	return &repository.GetAllResponse{
 		Todos: todos,
 	}, nil
 }
 
-func (s *server) Get(ctx context.Context, req *todo.GetRequest) (resp *todo.GetResponse, err error) {
+func (s *server) Get(ctx context.Context, req *repository.GetRequest) (resp *repository.GetResponse, err error) {
 	ctx, span := otel.Tracer("redis").Start(ctx, "Get")
 	defer span.End()
 	llog := log.WithField("id", req.Id)
@@ -156,20 +152,18 @@ func (s *server) Get(ctx context.Context, req *todo.GetRequest) (resp *todo.GetR
 		llog.WithError(err).Fatal("Failed to get todo")
 		return nil, err
 	}
-	return &todo.GetResponse{
-		Api:  "v1",
+	return &repository.GetResponse{
 		Todo: data,
 	}, nil
 }
 
-func (s *server) Delete(ctx context.Context, req *todo.DeleteRequest) (resp *todo.DeleteResponse, err error) {
+func (s *server) Delete(ctx context.Context, req *repository.DeleteRequest) (resp *repository.DeleteResponse, err error) {
 	ctx, span := otel.Tracer("redis").Start(ctx, "Get")
 	defer span.End()
 	log.WithField("id", req.Id).Info("Deleting todo")
 	s.RedisAdapter.redis.Del(ctx, req.Id)
-	return &todo.DeleteResponse{
-		Api: "v1",
-		Id:  req.Id,
+	return &repository.DeleteResponse{
+		Id: req.Id,
 	}, nil
 }
 

@@ -156,3 +156,19 @@ components:
       - COMPLETED
       - DELETED
       type: string
+    Change:
+      properties:
+        before:
+          $ref: '#/components/schemas/Todo'
+        after:
+          $ref: '#/components/schemas/Todo'
+        changeType:
+          $ref: '#/components/schemas/ChangeType'
+      type: object
+    ChangeType:
+      description: Type of the change
+      enum:
+      - CREATE
+      - UPDATE
+      - DELETE
+      type: string

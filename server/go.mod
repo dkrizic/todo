@@ -64,6 +64,8 @@ replace github.com/dkrizic/todo/api/todo => ../api/todo
 
 replace github.com/dkrizic/todo/server/memory => ./backend/memory
 
+replace github.com/dkrizic/todo/server/backend/repository => ./backend/repository
+
 replace github.com/dkrizic/todo/server/cmd => ./cmd
 
 replace github.com/dkrizic/todo/server/backend => ./backend

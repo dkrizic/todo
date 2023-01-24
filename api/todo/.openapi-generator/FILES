@@ -6,6 +6,8 @@ error.go
 helpers.go
 impl.go
 logger.go
+model_change.go
+model_change_type.go
 model_todo.go
 model_todo_status.go
 routers.go

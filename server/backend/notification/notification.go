@@ -4,20 +4,20 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/dkrizic/todo/api/todo"
+	"github.com/dkrizic/todo/server/backend/repository"
 	"github.com/dkrizic/todo/server/sender"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 )
 
 type server struct {
-	todo.UnimplementedToDoServiceServer
-	original todo.ToDoServiceServer
+	original repository.TodoRepository
 	sender   *sender.Sender
 	enabled  bool
 }
 
 type NotificationConfig struct {
-	Original todo.ToDoServiceServer
+	Original repository.TodoRepository
 	Sender   *sender.Sender
 	Enabled  bool
 }
@@ -29,15 +29,15 @@ func NewServer(config *NotificationConfig) *server {
 		enabled:  config.Enabled,
 	}
 	// ensure server implements the interface
-	var _ todo.ToDoServiceServer = myServer
+	var _ repository.TodoRepository = myServer
 	log.Info("Notification server created")
 	return myServer
 }
 
-func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
+func (s *server) Create(ctx context.Context, req *repository.CreateOrUpdateRequest) (resp *repository.CreateOrUpdateResponse, err error) {
 	ctx, span := otel.Tracer("notification").Start(ctx, "Create")
 	defer span.End()
-	before, err3 := s.original.Get(ctx, &todo.GetRequest{Id: req.Todo.Id})
+	before, err3 := s.original.Get(ctx, &repository.GetRequest{Id: req.Todo.Id})
 	if err3 != nil {
 		log.WithError(err3).Error("Failed to get todo before deleting")
 		return nil, err3
@@ -45,7 +45,7 @@ func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 	resp, err = s.original.Create(ctx, req)
 	if err == nil {
 		if s.enabled {
-			change := todo.Change{
+			change := repository.Change{
 				Before:     before.Todo,
 				After:      resp.Todo,
 				ChangeType: todo.ChangeType_CREATE,
@@ -59,10 +59,10 @@ func (s *server) Create(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 	return resp, err
 }
 
-func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (resp *todo.CreateOrUpdateResponse, err error) {
+func (s *server) Update(ctx context.Context, req *repository.CreateOrUpdateRequest) (resp *repository.CreateOrUpdateResponse, err error) {
 	ctx, span := otel.Tracer("notification").Start(ctx, "Update")
 	defer span.End()
-	before, err3 := s.original.Get(ctx, &todo.GetRequest{Id: req.Todo.Id})
+	before, err3 := s.original.Get(ctx, &repository.GetRequest{Id: req.Todo.Id})
 	if err3 != nil {
 		log.WithError(err3).Error("Failed to get todo before deleting")
 		return nil, err3
@@ -84,22 +84,22 @@ func (s *server) Update(ctx context.Context, req *todo.CreateOrUpdateRequest) (r
 	return resp, err
 }
 
-func (s *server) GetAll(ctx context.Context, req *todo.GetAllRequest) (resp *todo.GetAllResponse, err error) {
+func (s *server) GetAll(ctx context.Context, req *repository.GetAllRequest) (resp *repository.GetAllResponse, err error) {
 	ctx, span := otel.Tracer("notification").Start(ctx, "GetAll")
 	defer span.End()
 	log.WithField("req", req).Info("notification-GetAll")
 	return s.original.GetAll(ctx, req)
 }
-func (s *server) Get(ctx context.Context, req *todo.GetRequest) (resp *todo.GetResponse, err error) {
+func (s *server) Get(ctx context.Context, req *repository.GetRequest) (resp *repository.GetResponse, err error) {
 	ctx, span := otel.Tracer("notification").Start(ctx, "Get")
 	defer span.End()
 	return s.original.Get(ctx, req)
 }
 
-func (s *server) Delete(ctx context.Context, req *todo.DeleteRequest) (resp *todo.DeleteResponse, err error) {
+func (s *server) Delete(ctx context.Context, req *repository.DeleteRequest) (resp *repository.DeleteResponse, err error) {
 	ctx, span := otel.Tracer("notification").Start(ctx, "Delete")
 	defer span.End()
-	before, err3 := s.original.Get(ctx, &todo.GetRequest{Id: req.Id})
+	before, err3 := s.original.Get(ctx, &repository.GetRequest{Id: req.Id})
 	if err3 != nil {
 		log.WithError(err3).Error("Failed to get todo before deleting")
 		return nil, err3
