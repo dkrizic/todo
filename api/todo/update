@@ -1,2 +1,0 @@
-#!/bin/bash
-openapi-generator generate -i openapi.yaml -g go-server -c go.yaml

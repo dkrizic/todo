@@ -1,6 +1,6 @@
 additionalProperties:
-  outputAsLibrary: false
-  onlyInterfaces: false
+  outputAsLibrary: true
+  onlyInterfaces: true
   packageName: todo
   packageVersion: 1.0.0
   router: chi

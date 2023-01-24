@@ -1,0 +1,8 @@
+#!/bin/bash
+openapi-generator generate \
+    -o todo \
+    --git-repo-id todo/api/todo \
+    --git-user-id dkrizic \
+	-i todo.yaml \
+	-g go-server \
+	-c go.yaml
