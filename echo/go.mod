@@ -4,7 +4,6 @@ go 1.19
 
 require (
 	github.com/cloudevents/sdk-go/v2 v2.13.0
-	github.com/dkrizic/todo/api/todo v0.0.0-20230118165209-d624f2212371
 	github.com/gorilla/mux v1.8.0
 	github.com/pytimer/mux-logrus v0.0.0-20200505085744-ce5a5e748151
 	github.com/sirupsen/logrus v1.9.0
@@ -18,7 +17,6 @@ require (
 require (
 	github.com/cenkalti/backoff/v4 v4.2.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
-	github.com/go-chi/chi/v5 v5.0.3 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -38,7 +36,7 @@ require (
 	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/text v0.6.0 // indirect
-	google.golang.org/genproto v0.0.0-20230117162540-28d6b9783ac4 // indirect
+	google.golang.org/genproto v0.0.0-20230123190316-2c411cf9d197 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 )
 
