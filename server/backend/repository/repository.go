@@ -19,6 +19,12 @@ type Todo struct {
 	Status      string
 }
 
+type Change struct {
+	Before     *Todo
+	After      *Todo
+	ChangeType string
+}
+
 type CreateOrUpdateRequest struct {
 	Todo *Todo
 }

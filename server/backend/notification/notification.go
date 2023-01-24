@@ -3,7 +3,6 @@ package notification
 import (
 	"context"
 	"encoding/json"
-	"github.com/dkrizic/todo/api/todo"
 	"github.com/dkrizic/todo/server/backend/repository"
 	"github.com/dkrizic/todo/server/sender"
 	log "github.com/sirupsen/logrus"
@@ -48,7 +47,7 @@ func (s *server) Create(ctx context.Context, req *repository.CreateOrUpdateReque
 			change := repository.Change{
 				Before:     before.Todo,
 				After:      resp.Todo,
-				ChangeType: todo.ChangeType_CREATE,
+				ChangeType: "CREATE",
 			}
 			err2 := s.send(ctx, change)
 			if err2 != nil {
@@ -70,10 +69,10 @@ func (s *server) Update(ctx context.Context, req *repository.CreateOrUpdateReque
 	resp, err = s.original.Update(ctx, req)
 	if err == nil {
 		if s.enabled {
-			change := todo.Change{
+			change := repository.Change{
 				Before:     before.Todo,
 				After:      resp.Todo,
-				ChangeType: todo.ChangeType_UPDATE,
+				ChangeType: "UPDATE",
 			}
 			err2 := s.send(ctx, change)
 			if err2 != nil {
@@ -107,10 +106,10 @@ func (s *server) Delete(ctx context.Context, req *repository.DeleteRequest) (res
 	resp, err = s.original.Delete(ctx, req)
 	if err == nil {
 		if s.enabled {
-			change := todo.Change{
+			change := repository.Change{
 				Before:     before.Todo,
 				After:      nil,
-				ChangeType: todo.ChangeType_DELETE,
+				ChangeType: "DELETE",
 			}
 			err2 := s.send(ctx, change)
 			if err2 != nil {
@@ -121,7 +120,7 @@ func (s *server) Delete(ctx context.Context, req *repository.DeleteRequest) (res
 	return resp, err
 }
 
-func (s *server) send(ctx context.Context, change todo.Change) (err error) {
+func (s *server) send(ctx context.Context, change repository.Change) (err error) {
 	ctx, span := otel.Tracer("notification").Start(ctx, "send")
 	defer span.End()
 	data, err := convert(change)
@@ -133,7 +132,7 @@ func (s *server) send(ctx context.Context, change todo.Change) (err error) {
 	return nil
 }
 
-func convert(change todo.Change) (data []byte, err error) {
+func convert(change repository.Change) (data []byte, err error) {
 	data, err = json.Marshal(change)
 	if err != nil {
 		log.WithError(err).Error("Failed to convert change to json")

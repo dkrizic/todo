@@ -41,22 +41,6 @@ components:
       - ACTIVE
       - COMPLETED
       - DELETED
-    Change:
-      type: object
-      properties:
-        before:
-          $ref: '#/components/schemas/Todo'
-        after:
-          $ref: '#/components/schemas/Todo'
-        changeType:
-          $ref: '#/components/schemas/ChangeType'
-    ChangeType:
-        type: string
-        description: Type of the change
-        enum:
-        - CREATE
-        - UPDATE
-        - DELETE
 paths:
   /api/v1/todos:
     get:

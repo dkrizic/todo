@@ -1,24 +1,25 @@
 package notification
 
 import (
-	"github.com/dkrizic/todo/api/todo"
+	repository "github.com/dkrizic/todo/server/backend/repository"
 	"testing"
 )
 
 // test convert function
 func TestConvert(t *testing.T) {
 	// create dummy change object
-	change := todo.Change{
-		Before: &todo.ToDo{
+	change := repository.Change{
+		Before: &repository.Todo{
 			Id:          "1",
 			Title:       "title",
 			Description: "description",
 		},
-		After: &todo.ToDo{
+		After: &repository.Todo{
 			Id:          "2",
 			Title:       "title",
 			Description: "description",
 		},
+		ChangeType: "UPDATE",
 	}
 
 	// convert todo object to json
@@ -31,7 +32,7 @@ func TestConvert(t *testing.T) {
 	str := string(data)
 
 	// compare data with expected value
-	expected := "{\"before\":{\"id\":\"1\",\"title\":\"title\",\"description\":\"description\"},\"after\":{\"id\":\"2\",\"title\":\"title\",\"description\":\"description\"}}"
+	expected := "{\"Before\":{\"Id\":\"1\",\"Title\":\"title\",\"Description\":\"description\",\"Status\":\"\"},\"After\":{\"Id\":\"2\",\"Title\":\"title\",\"Description\":\"description\",\"Status\":\"\"},\"ChangeType\":\"UPDATE\"}"
 	if str != expected {
 		t.Errorf("Expected %v, got %v", expected, str)
 	}
