@@ -120,8 +120,13 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		err = json.NewEncoder(w).Encode(response.Todos)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
+	}
 	case "POST":
 		data, err := extracaDataFromRequest(ctx, r)
 		if err != nil {

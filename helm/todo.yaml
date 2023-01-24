@@ -55,7 +55,7 @@ metrics:
   serviceMonitor:
     enabled: true
 deploymentAnnotations:
-  sidecar.jaegertracing.io/inject: jaeger
+#  sidecar.jaegertracing.io/inject: jaeger
 podAnnotations:
   dapr.io/app-id: todo
   dapr.io/app-port: "8080"
@@ -74,3 +74,6 @@ autoscaling:
   maxReplicas: 5
   targetCPUUtilizationPercentage: 50
   targetMemoryUtilizationPercentage: 60
+tracing:
+  agent:
+    host: "otel-collector"
