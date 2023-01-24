@@ -5,6 +5,7 @@ COPY /server /build/server
 WORKDIR /build/server
 ENV GOOS=linux
 ENV GOARCH=${ARCH}
+ENV CGO_ENABLED=0
 RUN go build -ldflags="-extldflags=-static" -o server main.go
 
 FROM scratch

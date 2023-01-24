@@ -57,6 +57,7 @@ given backend.`,
 		return nil
 	},
 	PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
+		log.Info("Shutting down TracerProvider")
 		ctx, cancel := context.WithTimeout(cmd.Context(), time.Second*5)
 		defer cancel()
 		if err := shutdown(ctx); err != nil {
@@ -101,11 +102,12 @@ func initProvider(tracingEnabled bool, tracingEndpoint string) (func(context.Con
 		),
 	)
 	if err != nil {
+		log.WithError(err).Fatal("Failed to create resource")
 		return nil, fmt.Errorf("failed to create resource: %w", err)
 	}
 
 	log.WithField("oltpEndpoint", tracingEndpoint).Info("Connecting to OpenTelemetry Collector")
-	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
 	defer cancel()
 	conn, err := grpc.DialContext(ctx, tracingEndpoint,
 		// Note the use of insecure transport here. TLS is recommended in production.
@@ -120,6 +122,7 @@ func initProvider(tracingEnabled bool, tracingEndpoint string) (func(context.Con
 	// Set up a trace exporter
 	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
 	if err != nil {
+		log.WithError(err).Fatal("Failed to create trace exporter")
 		return nil, fmt.Errorf("failed to create trace exporter: %w", err)
 	}
 
