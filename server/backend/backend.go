@@ -117,15 +117,13 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		response, err := backend.Implementation.GetAll(ctx, &repository.GetAllRequest{})
 		if err != nil {
+			log.WithError(err).Error("Error while getting all todos"
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		data, err := convertTodoStructToJson(ctx, response.Todos)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		if err != nil {
+			log.WithError(err).Error("Error while converting todos to json")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -135,11 +133,13 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		data, err := extracaDataFromRequest(ctx, r)
 		if err != nil {
+			log.WithError(err).Error("Error while extracting data from request")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		todo, err := convertJsonToTodoStruct(ctx, data)
 		if err != nil {
+			log.WithError(err).Error("Error while converting json to todo struct")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -147,11 +147,12 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 			&todo,
 		})
 		if err != nil {
+			log.WithError(err).Error("Error while creating todo")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		w.WriteHeader(http.StatusCreated)
 		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(response)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
