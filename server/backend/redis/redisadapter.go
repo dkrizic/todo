@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"github.com/dkrizic/todo/api/todo"
+	repository "github.com/dkrizic/todo/server/backend/repository"
 	redis "github.com/go-redis/redis/v9"
 	"go.opentelemetry.io/otel"
 	"golang.org/x/net/context"
@@ -17,7 +17,7 @@ func NewRedisAdapter(redis *redis.Client) *RedisAdapter {
 	}
 }
 
-func (ra *RedisAdapter) ReadFromRedis(ctx context.Context, key string) (*todo.ToDo, error) {
+func (ra *RedisAdapter) ReadFromRedis(ctx context.Context, key string) (*repository.Todo, error) {
 	ctx, span := otel.Tracer("redis").Start(ctx, "ReadFromRedis")
 	defer span.End()
 	res, err := ra.redis.Exists(ctx, key).Result()
@@ -27,7 +27,7 @@ func (ra *RedisAdapter) ReadFromRedis(ctx context.Context, key string) (*todo.To
 	if res == 0 {
 		return nil, nil
 	}
-	data := &todo.ToDo{
+	data := &repository.Todo{
 		Id:          key,
 		Title:       ra.redis.HGet(ctx, key, title).Val(),
 		Description: ra.redis.HGet(ctx, key, description).Val(),
@@ -35,7 +35,7 @@ func (ra *RedisAdapter) ReadFromRedis(ctx context.Context, key string) (*todo.To
 	return data, nil
 }
 
-func (ra *RedisAdapter) WriteToRedis(ctx context.Context, todo *todo.ToDo) (before *todo.ToDo, current *todo.ToDo, err error) {
+func (ra *RedisAdapter) WriteToRedis(ctx context.Context, todo *repository.Todo) (before *repository.Todo, current *repository.Todo, err error) {
 	ctx, span := otel.Tracer("redis").Start(ctx, "WriteToRedis")
 	defer span.End()
 	before, err = ra.ReadFromRedis(ctx, todo.Id)
@@ -51,7 +51,7 @@ func (ra *RedisAdapter) WriteToRedis(ctx context.Context, todo *todo.ToDo) (befo
 	return before, current, nil
 }
 
-func (ra *RedisAdapter) DeleteFromRedis(ctx context.Context, key string) (before *todo.ToDo, err error) {
+func (ra *RedisAdapter) DeleteFromRedis(ctx context.Context, key string) (before *repository.Todo, err error) {
 	ctx, span := otel.Tracer("redis").Start(ctx, "DeleteFromRedis")
 	defer span.End()
 	before, err = ra.ReadFromRedis(ctx, key)

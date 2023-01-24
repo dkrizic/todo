@@ -1,20 +1,16 @@
 package backend
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
-	"github.com/dkrizic/todo/api/todo"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	otgrpc "github.com/opentracing-contrib/go-grpc"
-	opentracing "github.com/opentracing/opentracing-go"
+	repository "github.com/dkrizic/todo/server/backend/repository"
+	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/reflection"
-	"net"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -23,7 +19,7 @@ type Backend struct {
 	GrpcPort       int
 	HealthPort     int
 	MetricsPort    int
-	Implementation todo.ToDoServiceServer
+	Implementation repository.TodoRepository
 	TraceProvider  *tracesdk.TracerProvider
 }
 
@@ -31,51 +27,69 @@ func (backend Backend) Start() (err error) {
 
 	log.WithFields(log.Fields{
 		"httpPort":       backend.HttpPort,
-		"grpcPort":       backend.GrpcPort,
 		"healthPort":     backend.HealthPort,
 		"metricsPort":    backend.MetricsPort,
 		"implementation": backend.Implementation,
 	}).Info("Starting backend")
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", backend.GrpcPort))
-	if err != nil {
-		log.WithField("grpcPort", backend.GrpcPort).WithError(err).Fatal("Failed to listen")
-		return err
-	}
 
-	s := grpc.NewServer()
-	grpc.UnaryInterceptor(otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()))
-	grpc.StreamInterceptor(otgrpc.OpenTracingStreamServerInterceptor(opentracing.GlobalTracer()))
-	log.Info("Tracing enabled")
-
-	todo.RegisterToDoServiceServer(s, backend.Implementation)
-	reflection.Register(s)
-	log.WithField("grpcPort", backend.GrpcPort).Info("Serving gRPC")
-	go func() {
-		log.Fatal(s.Serve(lis))
-	}()
-
-	log.WithField("grpcPort", backend.GrpcPort).Info("Starting gRPC gateway")
-	conn, err := grpc.DialContext(
-		context.Background(),
-		fmt.Sprintf("127.0.0.1:%d", backend.GrpcPort),
-		grpc.WithBlock(),
-		grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatal("Failed to dial", err)
-		return err
-	}
-
-	gwmux := runtime.NewServeMux()
-	err = todo.RegisterToDoServiceHandler(context.Background(), gwmux, conn)
-	if err != nil {
-		log.Fatal("Failed to register gateway", err)
-		return err
-	}
-
-	mux := http.NewServeMux()
-	mux.Handle("/", otelhttp.NewHandler(gwmux, "grpc-gateway"))
+	mux := chi.NewMux()
 	mux.HandleFunc("/swagger-ui/swagger.json", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "swagger.json")
+	})
+	mux.HandleFunc("/api/v1/todos", func(w http.ResponseWriter, r *http.Request) {
+		ctx, span := backend.TraceProvider.Tracer("backend").Start(r.Context(), "todos")
+		defer span.End()
+		switch r.Method {
+		case "GET":
+			response, err := backend.Implementation.GetAll(ctx, &repository.GetAllRequest{})
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+		case "POST":
+			data, err := extracaDataFromRequest(ctx, r)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			todo, err := convertJsonToTodoStruct(ctx, data)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			response, err := backend.Implementation.Create(ctx, &repository.CreateOrUpdateRequest{
+				&todo,
+			})
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			w.WriteHeader(http.StatusCreated)
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	})
+	mux.HandleFunc("/api/v1/todos/{id}", func(w http.ResponseWriter, r *http.Request) {
+		ctx, span := backend.TraceProvider.Tracer("backend").Start(r.Context(), "todos/{id}")
+		defer span.End()
+		// get id from path
+		id := chi.URLParam(r, "id")
+		switch r.Method {
+		case "GET":
+			backend.Implementation.Get(ctx, &repository.GetRequest{
+				Id: id,
+			})
+		case "PUT":
+			backend.Implementation.Update(ctx, &repository.CreateOrUpdateRequest{})
+		case "DELETE":
+			backend.Implementation.Delete(ctx, &repository.DeleteRequest{})
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
 	})
 	mux.Handle("/swagger-ui/", http.StripPrefix("/swagger-ui/", http.FileServer(http.Dir("swagger-ui"))))
 
@@ -113,4 +127,35 @@ func (backend Backend) Start() (err error) {
 	log.Fatal(healthServer.ListenAndServe())
 
 	return nil
+}
+
+// convert request data in json format to Todo struct
+func convertJsonToTodoStruct(ctx context.Context, jsonData []byte) (todo repository.Todo, err error) {
+	_, span := otel.Tracer("backend").Start(ctx, "convertJsonToTodoStruct")
+	defer span.End()
+	err = json.Unmarshal(jsonData, &todo)
+	if err != nil {
+		return todo, err
+	}
+	return todo, nil
+}
+
+func extracaDataFromRequest(ctx context.Context, r *http.Request) (data []byte, err error) {
+	_, span := otel.Tracer("backend").Start(ctx, "extracaDataFromRequest")
+	defer span.End()
+	data, err = ioutil.ReadAll(r.Body)
+	if err != nil {
+		return data, err
+	}
+	return data, nil
+}
+
+func convertTodoStructToJson(ctx context.Context, todo repository.Todo) (jsonData []byte, err error) {
+	_, span := otel.Tracer("backend").Start(ctx, "convertTodoStructToJson")
+	defer span.End()
+	jsonData, err = json.Marshal(todo)
+	if err != nil {
+		return jsonData, err
+	}
+	return jsonData, nil
 }
