@@ -76,4 +76,4 @@ autoscaling:
   targetMemoryUtilizationPercentage: 60
 tracing:
   agent:
-    host: "otel-collector"
+    host: "otel-collector.observability"
