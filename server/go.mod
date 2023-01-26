@@ -4,8 +4,8 @@ go 1.19
 
 require (
 	github.com/dapr/go-sdk v1.6.0
-	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-redis/redis/v9 v9.0.0-rc.2
+	github.com/gorilla/mux v1.8.0
 	github.com/prometheus/client_golang v1.14.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
@@ -15,7 +15,7 @@ require (
 	go.opentelemetry.io/otel v1.11.2
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.11.2
 	go.opentelemetry.io/otel/sdk v1.11.2
-	golang.org/x/exp v0.0.0-20230125214544-b3c2aaf6208d
+	golang.org/x/exp v0.0.0-20230126173853-a67bb567ff2e
 	golang.org/x/net v0.5.0
 	google.golang.org/grpc v1.52.3
 )

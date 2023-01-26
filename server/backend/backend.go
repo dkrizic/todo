@@ -3,7 +3,7 @@ package backend
 import (
 	"fmt"
 	repository "github.com/dkrizic/todo/server/backend/repository"
-	"github.com/go-chi/chi/v5"
+	mux "github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -31,7 +31,7 @@ func (backend Backend) Start() (err error) {
 		"implementation": backend.Implementation,
 	}).Info("Starting backend")
 
-	mux := chi.NewMux()
+	mux := mux.NewRouter()
 	mux.HandleFunc("/swagger-ui/swagger.json", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "swagger.json")
 	})

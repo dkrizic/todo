@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/dkrizic/todo/server/backend/repository"
-	"github.com/go-chi/chi/v5"
+	mux "github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"io/ioutil"
@@ -63,16 +63,18 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 func TodoHandler(w http.ResponseWriter, r *http.Request) {
 	ctx, span := otel.Tracer("backend").Start(r.Context(), "todos/{id}")
 	defer span.End()
-	// get id from path
-	id := chi.URLParam(r, "id")
+	id := mux.Vars(r)["id"]
 	switch r.Method {
 	case "GET":
+		log.WithField("id", id).Info("Getting todo by id")
 		backend.Implementation.Get(ctx, &repository.GetRequest{
 			Id: id,
 		})
 	case "PUT":
+		log.WithField("id", id).Info("Updating todo by id")
 		backend.Implementation.Update(ctx, &repository.CreateOrUpdateRequest{})
 	case "DELETE":
+		log.WithField("id", id).Info("Deleting todo by id")
 		backend.Implementation.Delete(ctx, &repository.DeleteRequest{})
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
