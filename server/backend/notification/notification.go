@@ -38,6 +38,7 @@ func (s *server) Create(ctx context.Context, req *repository.CreateOrUpdateReque
 	defer span.End()
 	before, err3 := s.original.Get(ctx, &repository.GetRequest{Id: req.Todo.Id})
 	if err3 != nil {
+		span.RecordError(err3)
 		log.WithError(err3).Error("Failed to get todo before deleting")
 		return nil, err3
 	}
@@ -55,6 +56,7 @@ func (s *server) Create(ctx context.Context, req *repository.CreateOrUpdateReque
 			}
 		}
 	}
+	span.RecordError(err)
 	return resp, err
 }
 
