@@ -3,7 +3,7 @@ package backend
 import (
 	"fmt"
 	repository "github.com/dkrizic/todo/server/backend/repository"
-	mux "github.com/gorilla/mux"
+	chi "github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -30,14 +30,11 @@ func (backend Backend) Start() (err error) {
 	}).Info("Starting backend")
 	log.WithField("implementation", backend.Implementation.Name()).Info("Backend name")
 
-	mux := mux.NewRouter()
+	mux := chi.NewRouter()
 	mux.HandleFunc("/swagger-ui/swagger.json", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "swagger.json")
 	})
 
-	//if backend.TracingEnabled {
-	//	mux.Use(otelhttp.Middleware("todos"))
-	//}
 	mux.Handle("/api/v1/todos", otelhttp.NewHandler(http.HandlerFunc(TodosHandler), "todos"))
 	mux.Handle("/api/v1/todos/{id}", otelhttp.NewHandler(http.HandlerFunc(TodoHandler), "todo"))
 	mux.Handle("/swagger-ui/", http.StripPrefix("/swagger-ui/", http.FileServer(http.Dir("swagger-ui"))))

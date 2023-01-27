@@ -41,6 +41,9 @@ func NewServer(config *Config) *server {
 		Password: config.Pass, // no password set
 		DB:       0,           // use default DB
 	})
+
+	// redisotel.InstrumentTracing(rdb, redisotel.WithAttributes(attribute.String("db", "redis"))
+	// redisotel.InstrumentMetrics(rdb, redisotel.WithAttributes(attribute.String("db", "redis"))
 	status := rdb.Ping(context.Background())
 	if status.Err() != nil {
 		llog.WithError(status.Err()).Fatal("Failed to connect to redis")
