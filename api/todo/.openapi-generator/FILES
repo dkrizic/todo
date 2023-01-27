@@ -9,6 +9,7 @@ helpers.go
 impl.go
 logger.go
 main.go
+model_error.go
 model_todo.go
 model_todo_status.go
 routers.go

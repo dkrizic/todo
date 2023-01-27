@@ -28,6 +28,10 @@ paths:
                 type: array
           description: OK
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
           description: Internal Server Error
       summary: Get all todos
     post:
@@ -48,6 +52,10 @@ paths:
                 $ref: '#/components/schemas/Todo'
           description: Created
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
           description: Internal Server Error
       summary: Create a todo
   /api/v1/todos/{todoId}:
@@ -67,7 +75,11 @@ paths:
         "200":
           description: OK
         "500":
-          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+          description: OK
       summary: Delete a todo
     get:
       description: Get a todo
@@ -89,8 +101,16 @@ paths:
                 $ref: '#/components/schemas/Todo'
           description: OK
         "404":
-          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not found
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
           description: Internal Server Error
       summary: Get a todo
     put:
@@ -121,6 +141,10 @@ paths:
                 $ref: '#/components/schemas/Todo'
           description: OK
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
           description: Internal Server Error
       summary: Update a todo
 components:
@@ -156,3 +180,17 @@ components:
       - COMPLETED
       - DELETED
       type: string
+    Error:
+      properties:
+        code:
+          format: int32
+          type: integer
+        message:
+          type: string
+        traceId:
+          type: string
+      required:
+      - code
+      - message
+      - traceId
+      type: object

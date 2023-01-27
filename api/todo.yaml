@@ -41,6 +41,20 @@ components:
       - ACTIVE
       - COMPLETED
       - DELETED
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+        traceId:
+          type: string
+      required:
+        - code
+        - message
+        - traceId
 paths:
   /api/v1/todos:
     get:
@@ -58,6 +72,10 @@ paths:
                   $ref: '#/components/schemas/Todo'
         500:
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
         operationId: create_todo
         summary: Create a todo
@@ -78,6 +96,10 @@ paths:
                     $ref: '#/components/schemas/Todo'
           500:
             description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
   /api/v1/todos/{todoId}:
     get:
      operationId: get_todo
@@ -98,9 +120,17 @@ paths:
             schema:
               $ref: '#/components/schemas/Todo'
       404:
-        description: Not Found
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
       500:
         description: Internal Server Error
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
     put:
       operationId: update_todo
       summary: Update a todo
@@ -129,6 +159,10 @@ paths:
                 $ref: '#/components/schemas/Todo'
         500:
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     delete:
       operationId: delete_todo
       summary: Delete a todo
@@ -144,4 +178,8 @@ paths:
         200:
           description: OK
         500:
-          description: Internal Server Error
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
