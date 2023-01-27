@@ -6,7 +6,6 @@ import (
 	mux "github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"net/http"
 )
 
@@ -15,13 +14,13 @@ type Backend struct {
 	GrpcPort       int
 	HealthPort     int
 	MetricsPort    int
+	TracingEnabled bool
 	Implementation repository.TodoRepository
 }
 
 var backend Backend
 
 func (backend Backend) Start() (err error) {
-
 	log.WithFields(log.Fields{
 		"httpPort":       backend.HttpPort,
 		"healthPort":     backend.HealthPort,
@@ -33,8 +32,12 @@ func (backend Backend) Start() (err error) {
 	mux.HandleFunc("/swagger-ui/swagger.json", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "swagger.json")
 	})
-	mux.Handle("/api/v1/todos", otelhttp.NewHandler(http.HandlerFunc(TodosHandler), "todos"))
-	mux.Handle("/api/v1/todos/{id}", otelhttp.NewHandler(http.HandlerFunc(TodoHandler), "todos/{id}"))
+
+	//if backend.TracingEnabled {
+	//	mux.Use(otelhttp.Middleware("todos"))
+	//}
+	mux.HandleFunc("/api/v1/todos", TodosHandler)
+	mux.HandleFunc("/api/v1/todos/{id}", TodoHandler)
 	mux.Handle("/swagger-ui/", http.StripPrefix("/swagger-ui/", http.FileServer(http.Dir("swagger-ui"))))
 	backendServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", backend.HttpPort),

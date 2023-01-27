@@ -17,6 +17,7 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 	defer span.End()
 	switch r.Method {
 	case "GET":
+		log.WithField("Implementation", backend.Implementation).Info("Getting all todos")
 		response, err := backend.Implementation.GetAll(ctx, &repository.GetAllRequest{})
 		if err != nil {
 			log.WithError(err).Error("Error while getting all todos")

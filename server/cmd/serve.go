@@ -46,10 +46,12 @@ given backend.`,
 			"tracingEndpoint": tracingEndpoint,
 		}).Info("Tracing configuration")
 		var err error
-		shutdown, err = initProvider(tracingEnabled, tracingEndpoint)
-		if err != nil {
-			log.WithError(err).Fatal("Failed to initialize tracing provider")
-			return err
+		if tracingEnabled {
+			shutdown, err = initProvider(tracingEnabled, tracingEndpoint)
+			if err != nil {
+				log.WithError(err).Fatal("Failed to initialize tracing provider")
+				return err
+			}
 		}
 		return nil
 	},
