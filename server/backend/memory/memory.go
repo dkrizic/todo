@@ -24,6 +24,9 @@ func NewServer(maxEntries int) *server {
 	return myServer
 }
 
+func (s *server) Name() string {
+	return "memory"
+}
 func (s *server) Create(ctx context.Context, req *repository.CreateOrUpdateRequest) (resp *repository.CreateOrUpdateResponse, err error) {
 	ctx, span := otel.Tracer("memory").Start(ctx, "Create")
 	defer span.End()

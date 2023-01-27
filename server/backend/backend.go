@@ -28,6 +28,7 @@ func (backend Backend) Start() (err error) {
 		"metricsPort":    backend.MetricsPort,
 		"implementation": backend.Implementation,
 	}).Info("Starting backend")
+	log.WithField("implementation", backend.Implementation.Name()).Info("Backend name")
 
 	mux := mux.NewRouter()
 	mux.HandleFunc("/swagger-ui/swagger.json", func(w http.ResponseWriter, r *http.Request) {

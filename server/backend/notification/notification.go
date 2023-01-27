@@ -3,6 +3,7 @@ package notification
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/dkrizic/todo/server/backend/repository"
 	"github.com/dkrizic/todo/server/sender"
 	log "github.com/sirupsen/logrus"
@@ -33,6 +34,9 @@ func NewServer(config *NotificationConfig) *server {
 	return myServer
 }
 
+func (s *server) Name() string {
+	return fmt.Sprintf("Notification(%s)", s.original.Name())
+}
 func (s *server) Create(ctx context.Context, req *repository.CreateOrUpdateRequest) (resp *repository.CreateOrUpdateResponse, err error) {
 	ctx, span := otel.Tracer("notification").Start(ctx, "Create")
 	defer span.End()
@@ -87,7 +91,7 @@ func (s *server) Update(ctx context.Context, req *repository.CreateOrUpdateReque
 }
 
 func (s *server) GetAll(ctx context.Context, req *repository.GetAllRequest) (resp *repository.GetAllResponse, err error) {
-	log.WithField("original", s.original).Info("notification-GetAll")
+	log.WithField("original", s.original.Name()).Info("notification-GetAll")
 	ctx, span := otel.Tracer("notification").Start(ctx, "GetAll")
 	defer span.End()
 	return s.original.GetAll(ctx, req)

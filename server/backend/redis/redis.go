@@ -58,6 +58,10 @@ func NewServer(config *Config) *server {
 	return myServer
 }
 
+func (*server) Name() string {
+	return "redis"
+}
+
 func (s *server) Create(ctx context.Context, req *repository.CreateOrUpdateRequest) (resp *repository.CreateOrUpdateResponse, err error) {
 	ctx, span := otel.Tracer("redis").Start(ctx, "Create")
 	defer span.End()

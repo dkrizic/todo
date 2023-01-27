@@ -5,6 +5,7 @@ import (
 )
 
 type TodoRepository interface {
+	Name() string
 	Create(ctx context.Context, req *CreateOrUpdateRequest) (resp *CreateOrUpdateResponse, err error)
 	Update(ctx context.Context, req *CreateOrUpdateRequest) (resp *CreateOrUpdateResponse, err error)
 	GetAll(ctx context.Context, req *GetAllRequest) (resp *GetAllResponse, err error)
