@@ -42,7 +42,7 @@ func (s *server) Create(ctx context.Context, req *repository.CreateOrUpdateReque
 		log.WithError(err3).Error("Failed to get todo before deleting")
 		return nil, err3
 	}
-	resp, err = s.original.Create(ctx, req)
+	//resp, err = s.original.Create(ctx, req)
 	if err == nil {
 		if s.enabled {
 			change := repository.Change{
@@ -55,9 +55,10 @@ func (s *server) Create(ctx context.Context, req *repository.CreateOrUpdateReque
 				log.WithError(err2).Warn("Failed to send notification")
 			}
 		}
+		return resp, nil
 	}
 	span.RecordError(err)
-	return resp, err
+	return nil, err
 }
 
 func (s *server) Update(ctx context.Context, req *repository.CreateOrUpdateRequest) (resp *repository.CreateOrUpdateResponse, err error) {
