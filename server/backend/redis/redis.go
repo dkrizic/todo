@@ -100,7 +100,7 @@ func (s *server) Update(ctx context.Context, req *repository.CreateOrUpdateReque
 func (s *server) GetAll(ctx context.Context, req *repository.GetAllRequest) (resp *repository.GetAllResponse, err error) {
 	ctx, span := otel.Tracer("redis").Start(ctx, "GetAll")
 	defer span.End()
-	log.Info("Getting all todos")
+	log.WithField("implementation", s.Name()).Info("Getting all todos")
 
 	var cursor uint64 = 0
 	todos := make([]*repository.Todo, 0)
