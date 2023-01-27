@@ -7,7 +7,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	"net/http"
 )
 
@@ -17,7 +16,6 @@ type Backend struct {
 	HealthPort     int
 	MetricsPort    int
 	Implementation repository.TodoRepository
-	TraceProvider  *tracesdk.TracerProvider
 }
 
 var backend Backend

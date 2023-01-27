@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/dkrizic/todo/server/sender"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -30,8 +29,6 @@ const (
 	tracingEndpointFlag          = "tracing-endpoint"
 )
 
-var senderClient *sender.Sender
-var traceProvider *tracesdk.TracerProvider
 var shutdown func(context.Context) error
 
 // serveCmd represents the serve command
