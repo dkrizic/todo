@@ -70,9 +70,23 @@ func TodoHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
 		log.WithField("id", id).Info("Getting todo by id")
-		ActiveBackend.Implementation.Get(ctx, &repository.GetRequest{
+		response, err := ActiveBackend.Implementation.Get(ctx, &repository.GetRequest{
 			Id: id,
 		})
+		if err != nil {
+			log.WithError(err).Error("Error while getting todo")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		data, err := convertTodoStructToJson(ctx, response.Todo)
+		if err != nil {
+			log.WithError(err).Error("Error while converting todo to json")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(data)
 	case "PUT":
 		log.WithField("id", id).Info("Updating todo by id")
 		ActiveBackend.Implementation.Update(ctx, &repository.CreateOrUpdateRequest{})
@@ -105,8 +119,8 @@ func extracaDataFromRequest(ctx context.Context, r *http.Request) (data []byte, 
 	return data, nil
 }
 
-func convertTodoStructToJson(ctx context.Context, todo []*repository.Todo) (jsonData []byte, err error) {
-	_, span := otel.Tracer("backend").Start(ctx, "convertTodoStructToJson")
+func convertTodoStructToJson(ctx context.Context, todo *repository.Todo) (jsonData []byte, err error) {
+	_, span := otel.Tracer("backend").Start(ctx, "convertTodosStructToJson")
 	defer span.End()
 	jsonData, err = json.Marshal(todo)
 	if err != nil {

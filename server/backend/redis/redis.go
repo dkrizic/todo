@@ -120,13 +120,13 @@ func (s *server) GetAll(ctx context.Context, req *repository.GetAllRequest) (res
 			var description string
 			{
 				ctx2, span := otel.Tracer("redis").Start(ctx, "GetAll/ReadTitle")
-				span.SetAttributes(attribute.String("id", key))
+				span.SetAttributes(attribute.String("key", key )
 				title = s.RedisAdapter.redis.HGet(ctx2, key, title).Val()
 				span.End()
 			}
 			{
 				ctx2, span := otel.Tracer("redis").Start(ctx, "GetAll/ReadDescription")
-				span.SetAttributes(attribute.String("id", key))
+				span.SetAttributes(attribute.String("key", key )
 				description = s.RedisAdapter.redis.HGet(ctx2, key, description).Val()
 				span.End()
 			}
@@ -170,7 +170,3 @@ func (s *server) Delete(ctx context.Context, req *repository.DeleteRequest) (res
 		Id: req.Id,
 	}, nil
 }
-
-//func (redis *server) read(ctx context.Context, key string) (string, error) {
-//	return redis.redis.Get(ctx, key).Result()
-//}
