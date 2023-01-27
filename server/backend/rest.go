@@ -16,21 +16,23 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 	defer span.End()
 	switch r.Method {
 	case "GET":
-		response, err := backend.Implementation.GetAll(ctx, &repository.GetAllRequest{})
-		if err != nil {
-			log.WithError(err).Error("Error while getting all todos")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		data, err := convertTodoStructToJson(ctx, response.Todos)
-		if err != nil {
-			log.WithError(err).Error("Error while converting todos to json")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		// response, err := backend.Implementation.GetAll(ctx, &repository.GetAllRequest{})
+		//if err != nil {
+		//	log.WithError(err).Error("Error while getting all todos")
+		//	w.WriteHeader(http.StatusInternalServerError)
+		//	return
+		//}
+		//data, err := convertTodoStructToJson(ctx, response.Todos)
+		//if err != nil {
+		//	log.WithError(err).Error("Error while converting todos to json")
+		//	w.WriteHeader(http.StatusInternalServerError)
+		//	return
+		//}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write(data)
+		//w.Write(data)
+		// write "ok"
+		w.Write([]byte("ok"))
 	case "POST":
 		data, err := extracaDataFromRequest(ctx, r)
 		if err != nil {
