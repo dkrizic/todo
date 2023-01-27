@@ -46,7 +46,7 @@ func (s *server) Create(ctx context.Context, req *repository.CreateOrUpdateReque
 		log.WithError(err3).Error("Failed to get todo before deleting")
 		return nil, err3
 	}
-	//resp, err = s.original.Create(ctx, req)
+	resp, err = s.original.Create(ctx, req)
 	if err == nil {
 		if s.enabled {
 			change := repository.Change{
