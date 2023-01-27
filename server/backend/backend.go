@@ -18,7 +18,7 @@ type Backend struct {
 	Implementation repository.TodoRepository
 }
 
-var backend Backend
+var ActiveBackend Backend
 
 func (backend Backend) Start() (err error) {
 	log.WithFields(log.Fields{

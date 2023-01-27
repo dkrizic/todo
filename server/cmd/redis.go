@@ -68,13 +68,15 @@ var redisCmd = &cobra.Command{
 			Enabled:  notificationsEnabled,
 		})
 
-		return backend.Backend{
+		backend.ActiveBackend = backend.Backend{
 			HttpPort:       httpPort,
 			GrpcPort:       grpcPort,
 			HealthPort:     healthPort,
 			MetricsPort:    metricsPort,
 			Implementation: notification,
-		}.Start()
+		}
+		backend.ActiveBackend.Start()
+		return nil
 	},
 }
 

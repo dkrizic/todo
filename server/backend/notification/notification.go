@@ -90,8 +90,7 @@ func (s *server) GetAll(ctx context.Context, req *repository.GetAllRequest) (res
 	log.WithField("original", s.original).Info("notification-GetAll")
 	ctx, span := otel.Tracer("notification").Start(ctx, "GetAll")
 	defer span.End()
-	// return s.original.GetAll(ctx, req)
-	return &repository.GetAllResponse{}, nil
+	return s.original.GetAll(ctx, req)
 }
 func (s *server) Get(ctx context.Context, req *repository.GetRequest) (resp *repository.GetResponse, err error) {
 	ctx, span := otel.Tracer("notification").Start(ctx, "Get")

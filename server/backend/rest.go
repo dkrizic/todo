@@ -17,8 +17,8 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 	defer span.End()
 	switch r.Method {
 	case "GET":
-		log.WithField("Implementation", backend.Implementation).Info("Getting all todos")
-		response, err := backend.Implementation.GetAll(ctx, &repository.GetAllRequest{})
+		log.WithField("Implementation", ActiveBackend.Implementation).Info("Getting all todos")
+		response, err := ActiveBackend.Implementation.GetAll(ctx, &repository.GetAllRequest{})
 		if err != nil {
 			log.WithError(err).Error("Error while getting all todos")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -47,7 +47,7 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		response, err := backend.Implementation.Create(ctx, &repository.CreateOrUpdateRequest{
+		response, err := ActiveBackend.Implementation.Create(ctx, &repository.CreateOrUpdateRequest{
 			&todo,
 		})
 		if err != nil {
@@ -70,15 +70,15 @@ func TodoHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
 		log.WithField("id", id).Info("Getting todo by id")
-		backend.Implementation.Get(ctx, &repository.GetRequest{
+		ActiveBackend.Implementation.Get(ctx, &repository.GetRequest{
 			Id: id,
 		})
 	case "PUT":
 		log.WithField("id", id).Info("Updating todo by id")
-		backend.Implementation.Update(ctx, &repository.CreateOrUpdateRequest{})
+		ActiveBackend.Implementation.Update(ctx, &repository.CreateOrUpdateRequest{})
 	case "DELETE":
 		log.WithField("id", id).Info("Deleting todo by id")
-		backend.Implementation.Delete(ctx, &repository.DeleteRequest{})
+		ActiveBackend.Implementation.Delete(ctx, &repository.DeleteRequest{})
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}

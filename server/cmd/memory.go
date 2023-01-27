@@ -56,14 +56,15 @@ It will not work if there are multiple instances running concurrently.`,
 			Enabled:  notificationsEnabled,
 		})
 
-		backend := backend.Backend{
+		backend.ActiveBackend = backend.Backend{
 			HttpPort:       httpPort,
 			GrpcPort:       grpcPort,
 			HealthPort:     healthPort,
 			MetricsPort:    metricsPort,
 			Implementation: notification,
-		}.Start()
-		return backend
+		}
+		backend.ActiveBackend.Start()
+		return nil
 	},
 }
 
