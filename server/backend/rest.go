@@ -35,15 +35,17 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write(data)
 	case "POST":
-		data, err := extracaDataFromRequest(ctx, r)
+		data, err := extractDataFromRequest(ctx, r)
 		if err != nil {
 			log.WithError(err).Error("Error while extracting data from request")
+			span.RecordError(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		todo, err := convertJsonToTodoStruct(ctx, data)
 		if err != nil {
 			log.WithError(err).Error("Error while converting json to todo struct")
+			span.RecordError(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -52,6 +54,7 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 		})
 		if err != nil {
 			log.WithError(err).Error("Error while creating todo")
+			span.RecordError(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -67,6 +70,7 @@ func TodoHandler(w http.ResponseWriter, r *http.Request) {
 	ctx, span := otel.Tracer("backend").Start(r.Context(), "todos/{id}")
 	defer span.End()
 	id := mux.Vars(r)["id"]
+	span.SetAttributes(attribute.KeyValue{Key: "id", Value: attribute.StringValue(id)})
 	switch r.Method {
 	case "GET":
 		log.WithField("id", id).Info("Getting todo by id")
@@ -75,12 +79,14 @@ func TodoHandler(w http.ResponseWriter, r *http.Request) {
 		})
 		if err != nil {
 			log.WithError(err).Error("Error while getting todo")
+			span.RecordError(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		data, err := convertTodoStructToJson(ctx, response.Todo)
 		if err != nil {
 			log.WithError(err).Error("Error while converting todo to json")
+			span.RecordError(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -89,10 +95,34 @@ func TodoHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(data)
 	case "PUT":
 		log.WithField("id", id).Info("Updating todo by id")
-		ActiveBackend.Implementation.Update(ctx, &repository.CreateOrUpdateRequest{})
+		response, err := ActiveBackend.Implementation.Update(ctx, &repository.CreateOrUpdateRequest{})
+		if err != nil {
+			log.WithError(err).Error("Error while updating todo")
+			span.RecordError(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		data, err := convertTodoStructToJson(ctx, response.Todo)
+		if err != nil {
+			log.WithError(err).Error("Error while converting todo to json")
+			span.RecordError(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(data)
 	case "DELETE":
 		log.WithField("id", id).Info("Deleting todo by id")
-		ActiveBackend.Implementation.Delete(ctx, &repository.DeleteRequest{})
+		_, err := ActiveBackend.Implementation.Delete(ctx, &repository.DeleteRequest{})
+		if err != nil {
+			log.WithError(err).Error("Error while deleting todo")
+			span.RecordError(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
@@ -110,7 +140,7 @@ func convertJsonToTodoStruct(ctx context.Context, jsonData []byte) (todo reposit
 	return todo, nil
 }
 
-func extracaDataFromRequest(ctx context.Context, r *http.Request) (data []byte, err error) {
+func extractDataFromRequest(ctx context.Context, r *http.Request) (data []byte, err error) {
 	_, span := otel.Tracer("backend").Start(ctx, "extracaDataFromRequest")
 	defer span.End()
 	data, err = ioutil.ReadAll(r.Body)

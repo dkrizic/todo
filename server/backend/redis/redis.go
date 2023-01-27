@@ -155,6 +155,7 @@ func (s *server) Get(ctx context.Context, req *repository.GetRequest) (resp *rep
 	data, err := s.RedisAdapter.ReadFromRedis(ctx, req.Id)
 	if err != nil {
 		llog.WithError(err).Fatal("Failed to get todo")
+		span.RecordError(err)
 		return nil, err
 	}
 	return &repository.GetResponse{
