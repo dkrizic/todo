@@ -112,6 +112,7 @@ func (s *server) GetAll(ctx context.Context, req *repository.GetAllRequest) (res
 		span2.End()
 		if err != nil {
 			log.WithError(err).Fatal("Failed to get keys")
+			span.RecordError(err)
 			return nil, err
 		}
 		for _, key := range keys {
@@ -120,13 +121,13 @@ func (s *server) GetAll(ctx context.Context, req *repository.GetAllRequest) (res
 			var description string
 			{
 				ctx2, span := otel.Tracer("redis").Start(ctx, "GetAll/ReadTitle")
-				span.SetAttributes(attribute.String("key", key )
+				span.SetAttributes(attribute.String("key", key))
 				title = s.RedisAdapter.redis.HGet(ctx2, key, title).Val()
 				span.End()
 			}
 			{
 				ctx2, span := otel.Tracer("redis").Start(ctx, "GetAll/ReadDescription")
-				span.SetAttributes(attribute.String("key", key )
+				span.SetAttributes(attribute.String("key", key))
 				description = s.RedisAdapter.redis.HGet(ctx2, key, description).Val()
 				span.End()
 			}

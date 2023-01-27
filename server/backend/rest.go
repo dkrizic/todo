@@ -25,7 +25,7 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		span.SetAttributes(attribute.KeyValue{Key: "todos", Value: attribute.Int64Value(int64(len(response.Todos)))})
-		data, err := convertTodoStructToJson(ctx, response.Todos)
+		data, err := convertTodosStructToJson(ctx, response.Todos)
 		if err != nil {
 			log.WithError(err).Error("Error while converting todos to json")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -104,6 +104,7 @@ func convertJsonToTodoStruct(ctx context.Context, jsonData []byte) (todo reposit
 	defer span.End()
 	err = json.Unmarshal(jsonData, &todo)
 	if err != nil {
+		span.RecordError(err)
 		return todo, err
 	}
 	return todo, nil
@@ -114,16 +115,29 @@ func extracaDataFromRequest(ctx context.Context, r *http.Request) (data []byte, 
 	defer span.End()
 	data, err = ioutil.ReadAll(r.Body)
 	if err != nil {
+		span.RecordError(err)
 		return data, err
 	}
 	return data, nil
 }
 
-func convertTodoStructToJson(ctx context.Context, todo *repository.Todo) (jsonData []byte, err error) {
+func convertTodosStructToJson(ctx context.Context, todos []*repository.Todo) ([]byte, error) {
 	_, span := otel.Tracer("backend").Start(ctx, "convertTodosStructToJson")
+	defer span.End()
+	jsonData, err := json.Marshal(todos)
+	if err != nil {
+		span.RecordError(err)
+		return nil, err
+	}
+	return jsonData, nil
+}
+
+func convertTodoStructToJson(ctx context.Context, todo *repository.Todo) (jsonData []byte, err error) {
+	_, span := otel.Tracer("backend").Start(ctx, "convertTodoStructToJson")
 	defer span.End()
 	jsonData, err = json.Marshal(todo)
 	if err != nil {
+		span.RecordError(err)
 		return jsonData, err
 	}
 	return jsonData, nil
