@@ -6,6 +6,7 @@ import (
 	mux "github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"net/http"
 )
 
@@ -36,8 +37,8 @@ func (backend Backend) Start() (err error) {
 	//if backend.TracingEnabled {
 	//	mux.Use(otelhttp.Middleware("todos"))
 	//}
-	mux.HandleFunc("/api/v1/todos", TodosHandler)
-	mux.HandleFunc("/api/v1/todos/{id}", TodoHandler)
+	mux.Handle("/api/v1/todos", otelhttp.NewHandler(http.HandlerFunc(TodosHandler), "todos"))
+	mux.Handle("/api/v1/todos/{id}", otelhttp.NewHandler(http.HandlerFunc(TodoHandler), "todo"))
 	mux.Handle("/swagger-ui/", http.StripPrefix("/swagger-ui/", http.FileServer(http.Dir("swagger-ui"))))
 	backendServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", backend.HttpPort),
