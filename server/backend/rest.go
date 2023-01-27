@@ -7,6 +7,7 @@ import (
 	mux "github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"io/ioutil"
 	"net/http"
 )
@@ -22,6 +23,7 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		span.SetAttributes(attribute.KeyValue{Key: "todos", Value: attribute.Int64Value(int64(len(response.Todos)))})
 		data, err := convertTodoStructToJson(ctx, response.Todos)
 		if err != nil {
 			log.WithError(err).Error("Error while converting todos to json")
