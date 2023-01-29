@@ -94,15 +94,38 @@ func TodoHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write(data)
 	case "PUT":
+		data, err := extractDataFromRequest(ctx, r)
+		if err != nil {
+			log.WithError(err).Error("Error while extracting data from request")
+			span.RecordError(err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		todo, err := convertJsonToTodoStruct(ctx, data)
+		if err != nil {
+			log.WithError(err).Error("Error while converting json to todo struct")
+			span.RecordError(err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		id := mux.Vars(r)["id"]
+		if todo.Id != id {
+			log.WithField("id", id).Error("Id in path does not match id in request body")
+			span.RecordError(err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 		log.WithField("id", id).Info("Updating todo by id")
-		response, err := ActiveBackend.Implementation.Update(ctx, &repository.CreateOrUpdateRequest{})
+		response, err := ActiveBackend.Implementation.Update(ctx, &repository.CreateOrUpdateRequest{
+			&todo,
+		})
 		if err != nil {
 			log.WithError(err).Error("Error while updating todo")
 			span.RecordError(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		data, err := convertTodoStructToJson(ctx, response.Todo)
+		data, err = convertTodoStructToJson(ctx, response.Todo)
 		if err != nil {
 			log.WithError(err).Error("Error while converting todo to json")
 			span.RecordError(err)

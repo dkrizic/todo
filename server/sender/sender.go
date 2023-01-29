@@ -30,6 +30,7 @@ func (n *Sender) SendNotification(ctx context.Context, message []byte) error {
 	})
 	llog.Debug("Sending sender")
 	client, err := dapr.NewClient()
+	defer client.Close()
 	if err != nil {
 		llog.WithError(err).Warn("Unable to create dapr client")
 		span.RecordError(err)
