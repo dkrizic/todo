@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/dkrizic/todo/server/backend/repository"
-	mux "github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -69,7 +69,7 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 func TodoHandler(w http.ResponseWriter, r *http.Request) {
 	ctx, span := otel.Tracer("backend").Start(r.Context(), "todos/{id}")
 	defer span.End()
-	id := mux.Vars(r)["id"]
+	id := chi.URLParam(r, "id")
 	span.SetAttributes(attribute.KeyValue{Key: "id", Value: attribute.StringValue(id)})
 	switch r.Method {
 	case "GET":
@@ -108,9 +108,9 @@ func TodoHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		id := mux.Vars(r)["id"]
+		// Check that the id in the path matches the id in the request body
 		if todo.Id != id {
-			log.WithField("id", id).Error("Id in path does not match id in request body")
+			log.WithField("id", id).WithField("bodyId", todo.Id).Error("Id in path does not match id in request body")
 			span.RecordError(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
