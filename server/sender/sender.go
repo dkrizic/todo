@@ -30,7 +30,6 @@ func (n *Sender) SendNotification(ctx context.Context, message []byte) error {
 	})
 	llog.Debug("Sending sender")
 	client, err := dapr.NewClient()
-	defer client.Close()
 	if err != nil {
 		llog.WithError(err).Warn("Unable to create dapr client")
 		span.RecordError(err)
@@ -40,6 +39,7 @@ func (n *Sender) SendNotification(ctx context.Context, message []byte) error {
 	err = client.PublishEvent(ctx, n.PubSubName, n.TopicName, message)
 	if err != nil {
 		llog.WithError(err).Warn("Unable to send sender")
+		span.RecordError(err)
 		return err
 	}
 	return nil
