@@ -13,6 +13,10 @@ import (
 	"net/http"
 )
 
+type Error struct {
+	Message string `json:"message"`
+}
+
 func TodosHandler(w http.ResponseWriter, r *http.Request) {
 	ctx, span := otel.Tracer("backend").Start(r.Context(), "todos")
 	defer span.End()
@@ -32,6 +36,14 @@ func TodosHandler(w http.ResponseWriter, r *http.Request) {
 			log.WithError(err).Error("Error while converting todos to json")
 			span.RecordError(err)
 			w.WriteHeader(http.StatusInternalServerError)
+			data, err := createErrorJson(ctx, "Error while converting todos to json")
+			if err != nil {
+				log.WithError(err).Error("Error while creating error json")
+				span.RecordError(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			w.Write(data)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
@@ -204,6 +216,18 @@ func convertTodoStructToJson(ctx context.Context, todo *repository.Todo) (jsonDa
 	defer span.End()
 	jsonData, err = json.Marshal(todo)
 	if err != nil {
+		span.RecordError(err)
+		return jsonData, err
+	}
+	return jsonData, nil
+}
+
+func createErrorJson(ctx context.Context, message string) (jsonData []byte, err error) {
+	_, span := otel.Tracer("backend").Start(ctx, "createErrorJson")
+	defer span.End()
+	jsonData, err = json.Marshal(map[string]string{"error": message})
+	if err != nil {
+		span.SetStatus(codes.Error, err.Error())
 		span.RecordError(err)
 		return jsonData, err
 	}
