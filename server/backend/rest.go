@@ -90,7 +90,7 @@ func TodoHandler(w http.ResponseWriter, r *http.Request) {
 		data, err := convertTodoStructToJson(ctx, response.Todo)
 		if err != nil {
 			log.WithError(err).Error("Error while converting todo to json")
-			span.SetStatus(codes.Error, err.Error()
+			span.SetStatus(codes.Error, err.Error())
 			span.RecordError(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -110,7 +110,7 @@ func TodoHandler(w http.ResponseWriter, r *http.Request) {
 		todo, err := convertJsonToTodoStruct(ctx, data)
 		if err != nil {
 			log.WithError(err).Error("Error while converting json to todo struct")
-			span.SetStatus(codes.Error, err.Error()
+			span.SetStatus(codes.Error, err.Error())
 			span.RecordError(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return

@@ -5,6 +5,7 @@ import (
 	dapr "github.com/dapr/go-sdk/client"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
 )
 
 type Sender struct {
@@ -33,6 +34,7 @@ func (n *Sender) SendNotification(ctx context.Context, message []byte) error {
 	client, err := dapr.NewClient()
 	if err != nil {
 		llog.WithError(err).Warn("Unable to create dapr client")
+		span.SetStatus(codes.Error, err.Error())
 		span.RecordError(err)
 		return err
 	}
@@ -42,6 +44,7 @@ func (n *Sender) SendNotification(ctx context.Context, message []byte) error {
 	err = client.PublishEvent(ctx, n.PubSubName, n.TopicName, message)
 	if err != nil {
 		llog.WithError(err).Warn("Unable to send sender")
+		span.SetStatus(codes.Error, err.Error())
 		span.RecordError(err)
 		return err
 	}
