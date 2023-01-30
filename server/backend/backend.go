@@ -26,7 +26,7 @@ func (backend Backend) Start() (err error) {
 		"httpPort":       backend.HttpPort,
 		"healthPort":     backend.HealthPort,
 		"metricsPort":    backend.MetricsPort,
-		"implementation": backend.Implementation,
+		"implementation": backend.Implementation.Name(),
 	}).Info("Starting backend")
 	log.WithField("implementation", backend.Implementation.Name()).Info("Backend name")
 
