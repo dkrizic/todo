@@ -189,7 +189,7 @@ func convertJsonToTodoStruct(ctx context.Context, jsonData []byte) (todo reposit
 }
 
 func extractDataFromRequest(ctx context.Context, r *http.Request) (data []byte, err error) {
-	_, span := otel.Tracer("backend").Start(ctx, "extracaDataFromRequest")
+	_, span := otel.Tracer("backend").Start(ctx, "extractDataFromRequest")
 	defer span.End()
 	data, err = ioutil.ReadAll(r.Body)
 	if err != nil {
