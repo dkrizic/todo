@@ -38,7 +38,7 @@ func (n *Sender) SendNotification(ctx context.Context, message []byte) error {
 	})
 	llog.Debug("Sending sender")
 
-	// ctx = client.WithTraceID(ctx, span.SpanContext().TraceID().String())
+	ctx = n.Client.WithTraceID(ctx, span.SpanContext().TraceID().String())
 	err := n.Client.PublishEvent(ctx, n.PubSubName, n.TopicName, message)
 	if err != nil {
 		llog.WithError(err).Warn("Unable to send sender")
