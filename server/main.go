@@ -20,3 +20,5 @@ import "github.com/dkrizic/todo/server/cmd"
 func main() {
 	cmd.Execute()
 }
+
+
