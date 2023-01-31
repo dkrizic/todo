@@ -4,8 +4,8 @@ go 1.19
 
 require (
 	github.com/dapr/go-sdk v1.6.0
-	github.com/dkrizic/todo/api/todo v0.0.0-00010101000000-000000000000
-	github.com/go-chi/chi/v5 v5.0.3
+	github.com/dkrizic/todo/api/todo v0.0.0-20230131112956-013a263a3947
+	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-redis/redis/v9 v9.0.0-rc.2
 	github.com/gorilla/mux v1.8.0
 	github.com/prometheus/client_golang v1.14.0
@@ -13,11 +13,11 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.15.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.37.0
-	go.opentelemetry.io/otel v1.11.2
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.11.2
-	go.opentelemetry.io/otel/sdk v1.11.2
-	golang.org/x/exp v0.0.0-20230126173853-a67bb567ff2e
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.38.0
+	go.opentelemetry.io/otel v1.12.0
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.12.0
+	go.opentelemetry.io/otel/sdk v1.12.0
+	golang.org/x/exp v0.0.0-20230131160201-f062dba9d201
 	golang.org/x/net v0.5.0
 	google.golang.org/grpc v1.52.3
 )
@@ -51,15 +51,15 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.11.2 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.11.2 // indirect
-	go.opentelemetry.io/otel/metric v0.34.0 // indirect
-	go.opentelemetry.io/otel/trace v1.11.2 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.12.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.12.0 // indirect
+	go.opentelemetry.io/otel/metric v0.35.0 // indirect
+	go.opentelemetry.io/otel/trace v1.12.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/text v0.6.0 // indirect
-	google.golang.org/genproto v0.0.0-20230125152338-dcaf20b6aeaa // indirect
+	google.golang.org/genproto v0.0.0-20230127162408-596548ed4efa // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
