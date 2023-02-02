@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/dapr/go-sdk v1.6.0
-	github.com/dkrizic/todo/api/todo v0.0.0-20230131221844-81f2c4cdcc31
+	github.com/dkrizic/todo/api/todo v0.0.0-20230131112956-013a263a3947
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-redis/redis/v9 v9.0.0-rc.2
 	github.com/prometheus/client_golang v1.14.0
@@ -55,7 +55,7 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/text v0.6.0 // indirect
-	google.golang.org/genproto v0.0.0-20230131230820-1c016267d619 // indirect
+	google.golang.org/genproto v0.0.0-20230127162408-596548ed4efa // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
