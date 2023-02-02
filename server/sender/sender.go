@@ -40,13 +40,7 @@ func (n *Sender) SendNotification(ctx context.Context, message []byte) error {
 	}
 	defer client.Close()
 
-	// ctx = client.WithTraceID(ctx, span.SpanContext().TraceID().String())
-	content := &dapr.DataContent{
-		ContentType: "application/json",
-		Data:        message,
-	}
-	_, err = client.InvokeMethodWithContent(ctx, "echo", "/notification", "POST", content)
-	// err = client.PublishEvent(ctx, n.PubSubName, n.TopicName, message)
+	err = client.PublishEvent(ctx, n.PubSubName, n.TopicName, message)
 	if err != nil {
 		llog.WithError(err).Warn("Unable to send sender")
 		span.SetStatus(codes.Error, err.Error())
