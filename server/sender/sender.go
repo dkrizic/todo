@@ -45,7 +45,7 @@ func (n *Sender) SendNotification(ctx context.Context, message []byte) error {
 		ContentType: "application/json",
 		Data:        message,
 	}
-	_, err = client.InvokeMethodWithContent(ctx, "echo", "/notification", "application/json", content)
+	_, err = client.InvokeMethodWithContent(ctx, "echo", "/notification", "GET", content)
 	// err = client.PublishEvent(ctx, n.PubSubName, n.TopicName, message)
 	if err != nil {
 		llog.WithError(err).Warn("Unable to send sender")
