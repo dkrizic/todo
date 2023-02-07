@@ -1,0 +1,15 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: todo-pubsub
+  namespace: todo
+spec:
+  metadata:
+  - name: redisHost
+    value: redis-master:6379
+  - name: consumerID
+    value: todo-pubsub
+  - name: enableTLS
+    value: "false"
+  type: pubsub.redis
+  version: v1
