@@ -11,19 +11,12 @@ import (
 type Sender struct {
 	PubSubName string
 	TopicName  string
-	Client     dapr.Client
 }
 
 func NewSender(pubSubName string, topicName string) (notification *Sender, err error) {
-	client, err := dapr.NewClient()
-	if err != nil {
-		log.WithError(err).Warn("Unable to create dapr client")
-		return nil, err
-	}
 	return &Sender{
 		PubSubName: pubSubName,
 		TopicName:  topicName,
-		Client:     client,
 	}, nil
 }
 
@@ -38,8 +31,16 @@ func (n *Sender) SendNotification(ctx context.Context, message []byte) error {
 	})
 	llog.Debug("Sending sender")
 
-	ctx = n.Client.WithTraceID(ctx, span.SpanContext().TraceID().String())
-	err := n.Client.PublishEvent(ctx, n.PubSubName, n.TopicName, message)
+	client, err := dapr.NewClient()
+	if err != nil {
+		llog.WithError(err).Warn("Unable to create dapr client")
+		span.SetStatus(codes.Error, err.Error())
+		span.RecordError(err)
+		return err
+	}
+	defer client.Close()
+
+	err = client.PublishEvent(ctx, n.PubSubName, n.TopicName, message)
 	if err != nil {
 		llog.WithError(err).Warn("Unable to send sender")
 		span.SetStatus(codes.Error, err.Error())
