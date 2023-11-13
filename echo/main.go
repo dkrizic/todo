@@ -24,7 +24,7 @@ import (
 
 const (
 	listenAddress = "0.0.0.0:8000"
-	oltpEndpoint  = "otel-collector.observability:4317"
+	oltpEndpoint  = "opentelemetry-collector.observability:4317"
 	appName       = "echo"
 )
 

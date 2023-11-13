@@ -76,4 +76,4 @@ autoscaling:
   targetMemoryUtilizationPercentage: 60
 tracing:
   enabled: true
-  endpoint: otel-collector.observability:4317
+  endpoint: opentelemetry-collector.observability:4317
